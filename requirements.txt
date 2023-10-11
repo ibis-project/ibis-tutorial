@@ -1,4 +1,4 @@
-ibis-framework[duckdb] == 6.1
+ibis-framework[duckdb] == 7
 duckdb == 0.8.1
 jupyterlab
 altair >= 5.0.1
