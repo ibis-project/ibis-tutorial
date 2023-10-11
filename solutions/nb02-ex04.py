@@ -2,7 +2,7 @@ sol4 = (
     basics
     .join(ratings, "tconst")
     .select("titleType", "primaryTitle", "numVotes", "averageRating", "isAdult")
-    .relabel("snake_case")
+    .rename("snake_case")
     .filter(
         [
             _.title_type == "movie",
