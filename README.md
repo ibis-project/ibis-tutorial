@@ -31,6 +31,6 @@ python -m pip install -r requirements.txt
 ### Clone this repository
 
 ```sh
-git clone https://github.com/gforsyth/ibis-tutorial.git
+git clone https://github.com/ibis-project/ibis-tutorial.git
 ```
 
