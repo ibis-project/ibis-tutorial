@@ -8,7 +8,7 @@ sol2 = (
         ]
     )
     .group_by("island")
-    .body_mass_g.max()
+    .agg(penguins.body_mass_g.max())
 )
 
 sol2

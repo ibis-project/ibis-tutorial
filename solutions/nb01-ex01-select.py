@@ -1,5 +1,5 @@
 # Convert the metric units to imperial, and drop the metric columns.
-penguins_imperial = penguins.select(
+penguins_imperial_select = penguins.select(
     "species",
     "island",
     "sex",
@@ -10,4 +10,4 @@ penguins_imperial = penguins.select(
     body_weight_lb=penguins.body_mass_g / 453.6,
 )
 
-penguins_imperial
+penguins_imperial_select
