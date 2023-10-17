@@ -1,5 +1,5 @@
 # Convert the metric units to imperial, and drop the metric columns.
-penguins_imperial = (
+penguins_imperial_mutate_drop = (
     penguins
     .mutate(
         bill_length_in=penguins.bill_length_mm / 25.4,
@@ -15,4 +15,4 @@ penguins_imperial = (
     )
 )
 
-penguins_imperial
+penguins_imperial_mutate_drop
