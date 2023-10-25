@@ -1,8 +1,10 @@
-# Ibis Tutorial EuroSciPy 2023
+# Ibis Tutorial PyData NYC 2023
 
 - 01: Basic verbs
 - 02: Memtables, joins, and selectors
 - 03: Exploring PyPI data: `.sql`, integrations, UDFs
+
+A previous iteration of this tutorial was given at EuroSciPy 2023 ([youtube recording](https://youtu.be/tkejUD5Uq40))  
 
 ## Setup
 
