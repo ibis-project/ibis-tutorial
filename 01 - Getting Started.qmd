@@ -1,0 +1,450 @@
+---
+title: Getting started
+jupyter: python3
+---
+
+## Installation
+
+See the [README](https://github.com/ibis-project/ibis-tutorial#setup) for up-to-date installation instructions!
+
+## Download some data
+
+There are other ways to get example data, but we'll start by downloading the penguins dataset
+$^1$.
+
+```{python}
+from pathlib import Path
+
+ddb_file = Path("palmer_penguins.ddb")
+
+if not ddb_file.exists():
+    import urllib.request
+
+    urllib.request.urlretrieve(
+        "https://storage.googleapis.com/ibis-tutorial-data/palmer_penguins.ddb",
+        ddb_file,
+    )
+```
+
+DuckDB is similar to sqlite -- we have a single file on disk (or an in-memory
+connection) that we can operate on.
+
+## Intro
+
+We can begin by importing Ibis and firing up a connection to DuckDB! (DuckDB is
+fast and runs locally, so it's handy for lots of use-cases, including
+tutorials).
+
+```{python}
+import ibis
+
+con = ibis.duckdb.connect("palmer_penguins.ddb", read_only=True)
+```
+
+**Note**: when you connect to a DuckDB database file, DuckDB will create a
+  lock-file to prevent data corruption.  If you see a `palmer_penguins.ddb.wal`
+  file, you can safely ignore it. It will get cleaned up automatically.
+
+
+Now we have a connection, we can start by looking around.  Are there any tables
+in this database (one would hope)?
+
+
+```{python}
+con.list_tables()
+```
+
+Yep, there's a table called `penguins`. Let's take a look at it.
+
+```{python}
+penguins = con.table("penguins")
+```
+
+By default, you'll get a `repr` showing the schema of the table, the column
+names and the dtype of each column.
+
+```{python}
+penguins
+```
+
+If we run `head` to peek at the data, you'll notice that we don't actually see
+data (yet), what's going on?
+
+```{python}
+penguins.head()
+```
+
+Ibis has a deferred execution model.  It builds up expressions based on what you
+ask it to do, and then executes those expressions on request.
+
+In this case, our query isn't too involved, we want to see the first few rows of
+the `penguins` table.
+
+We can do that by asking for the results of this query as a `pandas.DataFrame`:
+
+```{python}
+penguins.head().to_pandas()
+```
+
+Or a `pyarrow.Table`:
+
+```{python}
+penguins.head().to_pyarrow()
+```
+
+Or a `polars.DataFrame`:
+
+```{python}
+penguins.head().to_polars()
+```
+
+We'll get into more detail about what Ibis is doing a bit later on.  For now,
+the important point is that Ibis is deferred.
+
+## Interactive Mode
+
+Remmeber when we said Ibis is deferred? Sometimes you want eager execution so
+you can explore a dataset.  For most of this tutorial, we'll turn on
+`interactive` mode, where Ibis will eagerly execute as much of the query as it
+needs to in order to show you the first 10 rows of the result.
+
+```{python}
+ibis.options.interactive = True
+```
+
+```{python}
+penguins.head()
+```
+
+## Tables and Columns
+
+`penguins` is a table!  A table is a collection of one or more columns, each with a specific datatype.
+
+```{python}
+penguins.head()
+```
+
+```{python}
+type(penguins)
+```
+
+We can look at a single column of that table using the column name as an attribute:
+
+```{python}
+penguins.species
+```
+
+```{python}
+type(penguins.species)
+```
+
+## Filter
+
+```{python}
+penguins.filter(penguins.species == "Adelie")
+```
+
+```{python}
+#| scrolled: true
+penguins.filter((penguins.island == "Dream") & (penguins.species == "Adelie"))
+```
+
+```{python}
+expr = penguins.filter(
+    [
+        penguins.island == "Dream",
+        penguins.species == "Adelie",
+    ]
+)
+expr
+```
+
+```{python}
+ibis.to_sql(expr)
+```
+
+## Select
+
+```{python}
+penguins.select("species", "island", "year")
+```
+
+```{python}
+penguins.select(penguins.species, penguins.island, penguins.year)
+```
+
+```{python}
+penguins.select("species", "island", penguins.year)
+```
+
+## Drop
+
+```{python}
+penguins.drop("sex", "year")
+```
+
+```{python}
+penguins.drop(penguins.sex, penguins.year)
+```
+
+```{python}
+penguins.drop("sex", penguins.year)
+```
+
+## Mutate
+
+Everything we've seen so far has been subtractive -- removing rows or columns.
+What about _adding_ columns?
+
+```{python}
+penguins.mutate(bill_length_cm=penguins.bill_length_mm / 10)
+```
+
+## Method chaining
+
+You can build up complicated queries by chaining together Ibis methods. The
+output of many Ibis methods is a table (just like `penguins`!) and we can
+continue calling table methods until we're satisfied.  Or until we end up with
+something that _isn't_ a table.  More on that later.
+
+```{python}
+penguins.select("species", "island", "year", "bill_length_mm").drop("year")
+```
+
+Not the most staggeringly complicated query, but we'll see more soon.
+
+### Exercise 1
+
+Your PI is a cranky American biologist who thinks the metric system is for
+suckers (oh no).
+
+He demands that we convert all of the existing measurements (`mm` and `g`) to
+inches and lbs, respectively (I am so sorry). The PI is extra cranky this
+morning, so we had better make sure that ONLY the silly units are visible in the
+output.
+
+Some ~helpful~ cursed conversion factors:
+
+|  |  |
+| -- | -- |
+| mm -> in | divide by 25.4 |
+| g -> lb | divide by 453.6 |
+
+Two ways you might accomplish this:
+- Chaining `.mutate` to create new columns and `.drop` to drop the old metric columns
+- Using a single `.select` to create the new columns as well as select the relevant older columns
+
+Try both ways below! How do they compare?
+
+```{python}
+# Convert the metric units to imperial, and drop the metric columns.
+# Try this using a `.mutate` and `.drop` call.
+penguins_imperial_mutate_drop = ...
+```
+
+```{python}
+# Convert the metric units to imperial, and drop the metric columns.
+# Try this using a single `.select` call.
+penguins_imperial_select = ...
+```
+
+#### Solutions
+
+```{python}
+%load solutions/nb01-ex01-mutate-drop.py
+```
+
+```{python}
+%load solutions/nb01-ex01-select.py
+```
+
+### Does it matter which method you choose?
+
+In this case, no.  Sometimes, there might be a small difference in the generated
+SQL but they will be semantically equivalent..
+
+```{python}
+ibis.to_sql(penguins_imperial_mutate_drop)
+```
+
+```{python}
+ibis.to_sql(penguins_imperial_select)
+```
+
+In practice, small differences in the generated SQL don't make a difference.
+Any modern SQL execution engine will optimize variations to the same set of
+operations and there will be no measureable performance difference.
+
+## Order By
+
+Want to order your data by a given column or columns?  Use `order_by`!
+
+The default ordering direction is ascending:
+
+```{python}
+penguins.order_by(penguins.flipper_length_mm)
+```
+
+We can ask Ibis to sort in descending order, too.
+
+```{python}
+#| scrolled: true
+penguins.order_by(penguins.flipper_length_mm.desc())
+```
+
+Let's select out a subset of the columns to keep this a bit tidier.
+
+```{python}
+penguins.order_by(penguins.flipper_length_mm.desc()).select(
+    "species", "island", "flipper_length_mm"
+)
+```
+
+You can also call `ibis.desc` on the column name to set the order direction:
+
+```{python}
+penguins.order_by(ibis.desc("flipper_length_mm")).select("species", "island", "flipper_length_mm")
+```
+
+## Aggregate
+
+Ibis has several aggregate functions available to help summarize data.  All the
+old favorites are there: `mean`, `max`, `min`, `count`, `sum`...
+
+You can aggregate a column by calling the method on that column:
+
+```{python}
+penguins.flipper_length_mm.mean()
+```
+
+Or you can compute multiple aggregates using the `aggregate` method (also
+available as `agg` for faster typing):
+
+```{python}
+penguins.agg([penguins.flipper_length_mm.mean(), penguins.bill_depth_mm.max()])
+```
+
+But aggregates really shine when paired with a `group_by`!
+
+## Group By
+
+`group_by` creates groupings of rows that have the same value for one or more columns.
+
+But it doesn't do much on its own -- you can pair it with aggregate to get a result.
+
+```{python}
+penguins.group_by("species").agg()
+```
+
+Without any `aggregate` function specified, we get the distinct values of the grouped-column.
+
+We can add a second column to the `group_by` to get the distinct pairs across both columns:
+
+```{python}
+penguins.group_by(["species", "island"]).agg()
+```
+
+Now, if we add an aggregation function to that, we start to really open things up.
+
+```{python}
+penguins.group_by(["species", "island"]).agg(penguins.bill_length_mm.mean())
+```
+
+By adding that `mean` to the `aggregate`, we now have a concise way to calculate
+aggregates over each of the distinct groups in the `group_by`. And we can
+calculate as many aggregates as we need.
+
+```{python}
+penguins.group_by(["species", "island"]).agg(
+    [penguins.bill_length_mm.mean(), penguins.flipper_length_mm.max()]
+)
+```
+
+If we need more specific groups, we can add to the `group_by`.
+
+```{python}
+penguins.group_by(["species", "island", "sex"]).agg(
+        [penguins.bill_length_mm.mean(), penguins.flipper_length_mm.max()]
+    )
+```
+
+## Exercises
+
+Time to use what we've learned to answer some penguin questions.
+
+### Exercise 2
+
+What was the largest female penguin (by body mass) on each island in the year 2008?
+
+
+#### Solution
+
+Note that there are several ways these queries could be written - it's fine if
+your solution doesn't look like ours, what's important is that the results are
+the same.
+
+```{python}
+%load solutions/nb01-ex02.py
+```
+
+### Exercise 3
+
+What was the largest male penguin (by body mass) on each island for each year of
+data collection?
+
+
+#### Solution
+
+```{python}
+%load solutions/nb01-ex03.py
+```
+
+## Some useful extras for staying sane
+
+### `cast`
+
+Sometimes when you parse data, _especially_ from CSVs, the types get a bit
+messed up. Or you might be loading in a `parquet` file where everything is
+defined as a `string`.  We can clean that up pretty quickly.
+
+You can cast from floats to ints:
+
+```{python}
+penguins.bill_length_mm.cast("int32")
+```
+
+And from ints to floats:
+
+```{python}
+penguins.year.cast("float64")  # this is a terrible idea
+```
+
+You can cast numeric columns to strings:
+
+```{python}
+penguins.year.cast("str")  # or "string"
+```
+
+And numeric strings to numbers:
+
+```{python}
+penguins.year.cast("str").cast("int64")
+```
+
+But `ibis` will yell if you try to cast a non-numeric string to a number:
+
+```{python}
+#| scrolled: true
+penguins.species.cast("int32")
+```
+
+### dropna
+
+Does what it says on the box -- drop the `NULL`s from a dataset.
+
+```{python}
+penguins.dropna()
+```
+
+1: Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. https://allisonhorst.github.io/palmerpenguins/. doi: 10.5281/zenodo.3960218.
+
