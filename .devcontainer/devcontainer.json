@@ -1,17 +1,25 @@
 {
-    "image": "mcr.microsoft.com/devcontainers/universal:2",
-    "waitFor": "onCreateCommand",
-    "updateContentCommand": "python3 -m pip install -r requirements.txt",
-    "postCreateCommand": "",
-    "customizations": {
-      "codespaces": {
-        "openFiles": []
-      },
-      "vscode": {
-        "extensions": [
-          "ms-toolsai.jupyter",
-          "ms-python.python"
-        ]
-      }
+  "image": "mcr.microsoft.com/vscode/devcontainers/python:3.11",
+  "waitFor": "onCreateCommand",
+  "postCreateCommand": ".devcontainer/postCreate.sh",
+  "customizations": {
+    "codespaces": {
+      "openFiles": []
+    },
+    "vscode": {
+      "extensions": ["ms-toolsai.jupyter", "ms-python.python"]
+    }
+  },
+  "features": {
+    "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {
+      "extensions": "httpfs,sqlite,postgres,parquet,json,arrow,mysql",
+      "version": "0.10.2"
+    },
+    "ghcr.io/itsmechlark/features/postgresql:1": {
+      "version": "15"
+    },
+    "ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {
+      "version": "15"
     }
   }
+}
