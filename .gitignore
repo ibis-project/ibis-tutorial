@@ -2,3 +2,6 @@
 *.ddb
 *.parquet
 *.wal
+__pycache__
+*.html
+*_files/
