@@ -126,12 +126,12 @@ Try swapping out `jaccard` for a different similarity function available in Duck
 One possible solution:
 
 ```{python}
-%load solutions/nb03-ex01-jaro.py
+%load solutions/nb03_ex01_jaro.py
 ```
 
 ```{python}
 #| scrolled: true
-%load solutions/nb03-ex01-maint.py
+%load solutions/nb03_ex01_maint.py
 ```
 
 ## Integration with other tools
@@ -203,15 +203,15 @@ What's the deal with that spike at 12 maintainers?
 ### Solution
 
 ```{python}
-%load solutions/nb03-ex02-counts.py
+%load solutions/nb03_ex02_counts.py
 ```
 
 ```{python}
-%load solutions/nb03-ex02-ftw.py
+%load solutions/nb03_ex02_ftw.py
 ```
 
 ```{python}
-%load solutions/nb03-ex02-ftw-maintainers.py
+%load solutions/nb03_ex02_ftw_maintainers.py
 ```
 
 ## UDFs
@@ -301,7 +301,7 @@ Accept: application/json
 ### Solution
 
 ```{python}
-%load solutions/nb03-ex03.py
+%load solutions/nb03_ex03.py
 ```
 
 ## More exercises / questions:
@@ -317,7 +317,7 @@ Which package maintainers on PyPI have the most downloads across all the package
 
 ```{python}
 #| scrolled: true
-%load solutions/nb03-ex04.py
+%load solutions/nb03_ex04.py
 ```
 
 ### Exercise 5: What packages depend on `ibis-framework`?
@@ -328,7 +328,7 @@ Or fill in your package name of choice
 ### Solution
 
 ```{python}
-%load solutions/nb03-ex05.py
+%load solutions/nb03_ex05.py
 ```
 
 ### Exercise 6: What packages depend on things I maintain?
@@ -340,7 +340,7 @@ Or you can try looking up some of the Ibis maintainers dependency graphs (`gfors
 ### Solution
 
 ```{python}
-%load solutions/nb03-ex06.py
+%load solutions/nb03_ex06.py
 ```
 
 ### Exercise 7: What are the top pytest extensions?
@@ -351,7 +351,7 @@ We love `pytest` and so do a bunch of other people.  Their plugins/extensions al
 ### Solution
 
 ```{python}
-%load solutions/nb03-ex07.py
+%load solutions/nb03_ex07.py
 ```
 
 ### Exercise 8: Find the top 20 most depended on packages that have only one maintainer
@@ -362,6 +362,6 @@ Sometimes people refer to bus factors, other times we think of someone winning t
 ### Solution
 
 ```{python}
-%load solutions/nb03-ex08.py
+%load solutions/nb03_ex08.py
 ```
 
