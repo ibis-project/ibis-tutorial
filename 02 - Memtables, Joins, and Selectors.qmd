@@ -154,7 +154,11 @@ Let's say we want to filter on the contents of the `committed_right` column (adm
 We've so far used the `table_variable.column_name` construction, so let's try that:
 
 ```{python}
-t1.join(t3, "name").filter([t1.committed_right == True])
+try:
+    t1.join(t3, "name").filter([t1.committed_right == True])
+except AttributeError as e:
+    print(e)
+    pass
 ```
 
 Maybe a lambda function?
@@ -302,7 +306,7 @@ Join `basics` with `ratings` on the `tconst` column.
 
 ```{python}
 #| scrolled: true
-%load solutions/nb02-ex01.py
+%load solutions/nb02_ex01.py
 ```
 
 ### Exercise 2
@@ -313,7 +317,7 @@ Join `basics` with `ratings` on `tconst`, and select out only the `titleType`, `
 #### Solution
 
 ```{python}
-%load solutions/nb02-ex02.py
+%load solutions/nb02_ex02.py
 ```
 
 ### Exercise 3
@@ -329,11 +333,11 @@ There are two ways you might achieve this:
 #### Solution
 
 ```{python}
-%load solutions/nb02-ex03-rename.py
+%load solutions/nb02_ex03_rename.py
 ```
 
 ```{python}
-%load solutions/nb02-ex03-select.py
+%load solutions/nb02_ex03_select.py
 ```
 
 ### Exercise 4
@@ -344,7 +348,7 @@ Using the above joined table, compute the 10 non-adult movies with the highest a
 #### Solution
 
 ```{python}
-%load solutions/nb02-ex04.py
+%load solutions/nb02_ex04.py
 ```
 
 ## Expression portability
@@ -353,14 +357,14 @@ Using the above joined table, compute the 10 non-adult movies with the highest a
 import os
 
 # this will only work if you have snowflake credentials set up in this environment variable
-snowflake_con = ibis.connect(os.getenv("SNOWFLAKE_URL"))
+# snowflake_con = ibis.connect(os.getenv("SNOWFLAKE_URL"))
 ```
 
 Note that for demo purposes, we've preloaded these tables into our Snowflake account.
 But if you wanted to add them to your Snowflake account, you could make use of `read_parquet` or similar!
 
 ```{python}
-snowflake_con.list_tables(like="imdb")
+# snowflake_con.list_tables(like="imdb")
 ```
 
 ```{python}
@@ -368,15 +372,15 @@ ibis.options.interactive = False
 ```
 
 ```{python}
-expr = sol4.unbind()
+# expr = sol4.unbind()
 ```
 
 ```{python}
-expr
+# expr
 ```
 
 ```{python}
-snowflake_con.execute(expr).head(10)
+# snowflake_con.execute(expr).head(10)
 ```
 
 ## Selectors
@@ -453,7 +457,7 @@ We might want to ensure uniformity in our labeling.  Lowercase all of the string
 #### Solution
 
 ```{python}
-%load solutions/nb02-ex05.py
+%load solutions/nb02_ex05.py
 ```
 
 ### Exercise 6
@@ -464,6 +468,6 @@ We computed the z-score for a given column across every penguin on every island 
 #### Solution
 
 ```{python}
-%load solutions/nb02-ex06.py
+%load solutions/nb02_ex06.py
 ```
 

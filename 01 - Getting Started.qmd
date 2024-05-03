@@ -1,6 +1,7 @@
 ---
 title: Getting started
 jupyter: python3
+allow_errors: True
 ---
 
 ## Installation
@@ -239,13 +240,13 @@ Try both ways below! How do they compare?
 ```{python}
 # Convert the metric units to imperial, and drop the metric columns.
 # Try this using a `.mutate` and `.drop` call.
-penguins_imperial_mutate_drop = ...
+penguins_imperial_mutate_drop = penguins
 ```
 
 ```{python}
 # Convert the metric units to imperial, and drop the metric columns.
 # Try this using a single `.select` call.
-penguins_imperial_select = ...
+penguins_imperial_select = penguins
 ```
 
 #### Solutions
