@@ -12,7 +12,7 @@
   },
   "features": {
     "ghcr.io/eitsupi/devcontainer-features/duckdb-cli:1": {
-      "extensions": "httpfs,sqlite,postgres,parquet,json,arrow,mysql",
+      "extensions": "httpfs,sqlite,postgres,parquet,json,arrow",
       "version": "0.10.2"
     },
     "ghcr.io/itsmechlark/features/postgresql:1": {
