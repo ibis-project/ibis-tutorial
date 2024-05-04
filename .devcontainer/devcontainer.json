@@ -1,7 +1,5 @@
 {
-  "image": "mcr.microsoft.com/vscode/devcontainers/python:3.11-bookworm",
-  "waitFor": "onCreateCommand",
-  "postCreateCommand": ".devcontainer/postCreate.sh",
+  "build": { "dockerfile": "Dockerfile" },
   "customizations": {
     "codespaces": {
       "openFiles": ["00 - Start Here.ipynb"]
