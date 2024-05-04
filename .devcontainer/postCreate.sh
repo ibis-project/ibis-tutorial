@@ -6,5 +6,5 @@ sudo apt update -y
 sudo apt install -y graphviz
 
 # install tutorial deps
-python3 -m pip install ipython altair plotnine plotly ipykernel \
+python3 -m pip install ipython altair plotnine plotly ipykernel jupyter \
   'ibis-framework[duckdb,postgres,polars,visualization,examples]'
