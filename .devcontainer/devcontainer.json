@@ -3,7 +3,7 @@
   "postCreateCommand": ".devcontainer/postCreate.sh",
   "customizations": {
     "codespaces": {
-      "openFiles": ["00 - Start Here.ipynb"]
+      "openFiles": ["00 - Start Here.qmd"]
     },
     "vscode": {
       "extensions": ["ms-toolsai.jupyter", "ms-python.python", "quarto.quarto"]
