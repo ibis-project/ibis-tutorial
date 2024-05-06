@@ -16,13 +16,19 @@ $^1$.
 ```{python}
 from pathlib import Path
 
+import duckdb
+from packaging.version import parse as vparse
+
+duck_version = vparse(duckdb.__version__)
+
 ddb_file = Path("palmer_penguins.ddb")
+
 
 if not ddb_file.exists():
     import urllib.request
 
     urllib.request.urlretrieve(
-        "https://storage.googleapis.com/ibis-tutorial-data/palmer_penguins.ddb",
+        f"https://storage.googleapis.com/ibis-tutorial-data/penguins/0.{duck_version.minor}/palmer_penguins.ddb",
         ddb_file,
     )
 ```
@@ -400,7 +406,7 @@ data collection?
 %load solutions/nb01-ex03.py
 ```
 
-## Some useful extras for staying sane
+## Some useful extras
 
 ### `cast`
 
