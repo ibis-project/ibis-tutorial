@@ -24,14 +24,11 @@ tables = [
     "wheels",
 ]
 
-con = duckdb.connect()
+stmts = ["ATTACH 'dbname=postgres user=postgres' AS pycon2024 (TYPE POSTGRES)"]
 
-con.execute("ATTACH 'dbname=postgres user=postgres' AS pycon2024 (TYPE POSTGRES)")
-
-stmts = []
 for table in tables:
     url = f"https://storage.googleapis.com/ibis-tutorial-data/pypi/2024-04-24/{table}.parquet"
     stmts.append(f"CREATE OR REPLACE TABLE pycon2024.{table} AS FROM '{url}'")
 
-con.execute("; ".join(stmts))
+duckdb.execute("; ".join(stmts))
 ```
