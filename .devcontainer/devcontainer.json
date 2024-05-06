@@ -1,5 +1,6 @@
 {
   "build": { "dockerfile": "Dockerfile" },
+  "postCreateCommand": ".devcontainer/postCreate.sh",
   "customizations": {
     "codespaces": {
       "openFiles": ["00 - Start Here.ipynb"]
