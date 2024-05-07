@@ -1,6 +1,6 @@
 # Welcome to the Ibis tutorial!
 
-On the left 👈 is a file browser open with the tutorial notebooks.
+On the left 👈 there is a file browser open with the tutorial notebooks.
 
 For convenience they're also linked below 👇
 
