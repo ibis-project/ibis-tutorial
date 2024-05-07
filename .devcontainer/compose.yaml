@@ -1,0 +1,16 @@
+services:
+  postgres:
+    user: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+    image: postgres:15
+    healthcheck:
+      interval: 1s
+      retries: 20
+      test:
+        - CMD
+        - pg_isready
+    ports:
+      - 5432:5432
