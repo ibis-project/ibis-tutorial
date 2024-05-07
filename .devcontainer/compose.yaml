@@ -7,6 +7,12 @@ services:
       - ../..:/workspaces:cached
     command: sleep infinity
     network_mode: service:postgres
+    environment:
+      # elephant-shaped turtles all the way down
+      PGPASSWORD: postgres
+      PGHOST: postgres
+      PGUSER: postgres
+      PGDATABASE: postgres
   postgres:
     restart: unless-stopped
     environment:
