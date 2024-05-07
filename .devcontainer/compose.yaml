@@ -1,4 +1,12 @@
 services:
+  ibis-tutorial:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    network_mode: service:postgres
   postgres:
     restart: unless-stopped
     environment:
@@ -12,8 +20,6 @@ services:
       test:
         - CMD
         - pg_isready
-    ports:
-      - 5432:5432
     volumes:
       - postgres:/var/lib/postgresql/data
 

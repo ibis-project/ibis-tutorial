@@ -1,7 +1,10 @@
 {
   "build": { "dockerfile": "Dockerfile" },
-  "postCreateCommand": "docker compose up -d postgres",
   "postStartCommand": "bash",
+  "dockerComposeFile": "compose.yaml",
+  "service": "ibis-tutorial",
+  "runServices": ["postgres"],
+  "forwardPorts": ["postgres:5432"],
   "customizations": {
     "codespaces": {
       "openFiles": ["00 - Start Here.qmd"]
