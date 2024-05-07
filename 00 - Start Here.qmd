@@ -33,13 +33,14 @@ sql = ";\n".join(stmts)
 ```
 
 Let's take a look at the SQL we're going to run.
+
 ```{python}
 from IPython.display import Markdown
 
 Markdown(f"```sql\n{sql}\n```")
 ```
 
-Now let's execute it!
+And let's execute it.
 
 ```{python}
 import duckdb
@@ -48,7 +49,7 @@ con = duckdb.connect()
 con.execute(sql)
 ```
 
-Let's confirm that our PostgreSQL database contains the tables we just loaded.
+Finally, we'll confirm that our PostgreSQL database contains the tables we just loaded.
 
 ```{python}
 !psql <<< '\dt'
