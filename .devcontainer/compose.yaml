@@ -1,0 +1,33 @@
+services:
+  ibis-tutorial:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    network_mode: service:postgres
+    environment:
+      # elephant-shaped turtles all the way down
+      PGPASSWORD: postgres
+      PGHOST: postgres
+      PGUSER: postgres
+      PGDATABASE: postgres
+  postgres:
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+    image: postgres:15
+    healthcheck:
+      interval: 1s
+      retries: 20
+      test:
+        - CMD
+        - pg_isready
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:

@@ -1,0 +1,23 @@
+# Welcome to the Ibis tutorial!
+
+On the left 👈 there is a file browser open with the tutorial notebooks.
+
+For convenience they're also linked below 👇
+
+1. [Getting Started](./01%20-%20Getting%20Started.ipynb)
+1. [Memtables, Joins, and Selectors](./02%20-%20Memtables,%20Joins,%20and%20Selectors.ipynb)
+1. [Playing with PyPI](./03%20-%20Playing%20with%20PyPI.ipynb)
+
+
+Let's kick things off by loading some PyPI package data into a local PostgreSQL database!
+
+```{python}
+!duckdb < load.sql
+```
+
+And we'll confirm that our PostgreSQL database contains the tables we just loaded.
+
+```{python}
+!psql <<< '\dt'
+!psql < verify.sql
+```
