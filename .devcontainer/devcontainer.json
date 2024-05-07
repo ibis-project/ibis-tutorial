@@ -1,5 +1,4 @@
 {
-  "postStartCommand": "bash",
   "dockerComposeFile": "compose.yaml",
   "service": "ibis-tutorial",
   "runServices": ["postgres"],
