@@ -13,8 +13,6 @@ Let's kick things off by loading some PyPI package data into a local PostgreSQL 
 
 
 ```{python}
-import duckdb
-
 tables = [
     "deps",
     "maintainers",
@@ -24,11 +22,35 @@ tables = [
     "wheels",
 ]
 
+# attach to the running postgres instance
 stmts = ["ATTACH 'dbname=postgres user=postgres' AS pycon2024 (TYPE POSTGRES)"]
 
 for table in tables:
     url = f"https://storage.googleapis.com/ibis-tutorial-data/pypi/2024-04-24/{table}.parquet"
     stmts.append(f"CREATE OR REPLACE TABLE pycon2024.{table} AS FROM '{url}'")
 
-duckdb.execute("; ".join(stmts))
+sql = ";\n".join(stmts)
+```
+
+Let's take a look at the SQL we're going to run.
+```{python}
+from IPython.display import Markdown
+
+Markdown(f"```sql\n{sql}\n```")
+```
+
+Now let's execute it!
+
+```{python}
+import duckdb
+
+con = duckdb.connect()
+con.execute(sql)
+```
+
+Let's confirm that our PostgreSQL database contains the tables we just loaded.
+
+```{python}
+!psql <<< '\dt'
+!psql < verify.sql
 ```
