@@ -12,7 +12,7 @@
       "settings": {
         "extensions.ignoreRecommendations": true,
         "notifications.hideList": true,
-        "notifications.histToasts": true,
+        "notifications.hideToasts": true,
         "notifications.doNotDisturbMode": true,
         "update.showReleaseNotes": false,
         "vsicons.dontShowNewVersionMessage": true,
