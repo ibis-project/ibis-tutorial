@@ -1,9 +1,7 @@
 {
   "build": { "dockerfile": "Dockerfile" },
-  "dockerComposeFile": "compose.yaml",
+  "postCreateCommand": "docker compose up -d postgres",
   "postStartCommand": "bash",
-  "service": "postgres",
-  "shutdownAction": "stopCompose",
   "customizations": {
     "codespaces": {
       "openFiles": ["00 - Start Here.qmd"]
