@@ -9,6 +9,15 @@
       "openFiles": ["00 - Start Here.qmd"]
     },
     "vscode": {
+      "settings": {
+        "extensions.ignoreRecommendations": true,
+        "notifications.hideList": true,
+        "notifications.histToasts": true,
+        "notifications.doNotDisturbMode": true,
+        "update.showReleaseNotes": false,
+        "vsicons.dontShowNewVersionMessage": true,
+        "workbench.welcomePage.walkthroughs.openOnInstall": false
+      },
       "extensions": ["ms-toolsai.jupyter", "ms-python.python", "quarto.quarto"]
     }
   },
