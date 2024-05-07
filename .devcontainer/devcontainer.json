@@ -1,6 +1,7 @@
 {
   "build": { "dockerfile": "Dockerfile" },
   "postCreateCommand": ".devcontainer/postCreate.sh",
+  "postStartCommand": "bash",
   "customizations": {
     "codespaces": {
       "openFiles": ["00 - Start Here.qmd"]
