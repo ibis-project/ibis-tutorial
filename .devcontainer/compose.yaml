@@ -5,7 +5,7 @@ services:
       dockerfile: .devcontainer/Dockerfile
     volumes:
       - ../..:/workspaces:cached
-    command: bash
+    entrypoint: /bin/bash
     network_mode: service:postgres
     environment:
       # elephant-shaped turtles all the way down
@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
-    image: postgres:15-alpine
+    image: postgres:15
     healthcheck:
       interval: 1s
       retries: 20
