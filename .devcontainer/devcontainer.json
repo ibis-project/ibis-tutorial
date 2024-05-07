@@ -4,6 +4,7 @@
   "service": "ibis-tutorial",
   "runServices": ["postgres"],
   "forwardPorts": ["postgres:5432"],
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "customizations": {
     "codespaces": {
       "openFiles": ["00 - Start Here.qmd"]
