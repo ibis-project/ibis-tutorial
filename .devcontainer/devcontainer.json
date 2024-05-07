@@ -1,6 +1,7 @@
 {
   "build": { "dockerfile": "Dockerfile" },
   "dockerComposeFile": "compose.yaml",
+  "postStartCommand": "bash",
   "service": "postgres",
   "shutdownAction": "stopCompose",
   "customizations": {
