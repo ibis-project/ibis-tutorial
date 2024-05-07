@@ -5,7 +5,7 @@ services:
       dockerfile: .devcontainer/Dockerfile
     volumes:
       - ../..:/workspaces:cached
-    command: sleep infinity
+    command: bash
     network_mode: service:postgres
     environment:
       # elephant-shaped turtles all the way down
