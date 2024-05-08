@@ -32,7 +32,7 @@ for filename in filenames:
         import urllib.request
 
         urllib.request.urlretrieve(
-            f"https://storage.googleapis.com/ibis-tutorial-data/pypi/{filename}",
+            f"https://storage.googleapis.com/ibis-tutorial-data/pypi/2024-04-24/{filename}",
             path,
         )
 ```

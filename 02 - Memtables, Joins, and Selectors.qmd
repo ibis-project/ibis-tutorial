@@ -234,8 +234,8 @@ For this section, we'll use some of Ibis' built-in example datasets, specificall
 from pathlib import Path
 
 filenames = [
-    "imdb_basics_sample_5.parquet",
-    "imdb_ratings.parquet",
+    "imdb_title_basics_sample_5.parquet",
+    "imdb_title_ratings.parquet",
 ]
 
 folder = Path("imdb_smol")
@@ -249,7 +249,7 @@ for filename in filenames:
         import urllib.request
 
         urllib.request.urlretrieve(
-            f"https://storage.googleapis.com/ibis-tutorial-data/imdb_smol/{filename}",
+            f"https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/{filename}",
             path,
         )
 ```
@@ -268,13 +268,13 @@ con = ibis.duckdb.connect()
 
 ```{python}
 basics = con.read_parquet(
-    "imdb_smol/imdb_basics_sample_5.parquet", table_name="imdb_title_basics"
+    "imdb_smol/imdb_title_basics_sample_5.parquet", table_name="imdb_title_basics"
 )
 ```
 
 ```{python}
 ratings = con.read_parquet(
-    "imdb_smol/imdb_ratings.parquet", table_name="imdb_title_ratings"
+    "imdb_smol/imdb_title_ratings.parquet", table_name="imdb_title_ratings"
 )
 ```
 
