@@ -12,3 +12,8 @@ CREATE OR REPLACE TABLE pycon2024.scorecard_checks AS
   FROM 'https://storage.googleapis.com/ibis-tutorial-data/pypi/2024-04-24/scorecard_checks.parquet';
 CREATE OR REPLACE TABLE pycon2024.wheels AS
   FROM 'https://storage.googleapis.com/ibis-tutorial-data/pypi/2024-04-24/wheels.parquet';
+
+CREATE OR REPLACE TABLE pycon2024.imdb_title_basics AS
+  FROM 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet';
+CREATE OR REPLACE TABLE pycon2024.imdb_title_ratings AS
+  FROM 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_ratings.parquet';
