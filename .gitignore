@@ -5,3 +5,6 @@
 __pycache__
 *.html
 *_files/
+# pixi environments
+.pixi
+
