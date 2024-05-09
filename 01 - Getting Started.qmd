@@ -119,6 +119,8 @@ needs to in order to show you the first 10 rows of the result.
 ibis.options.interactive = True
 ```
 
+In interactive mode, we use `rich` to render the output inline:
+
 ```{python}
 penguins.head()
 ```
@@ -141,27 +143,46 @@ We can look at a single column of that table using the column name as an attribu
 penguins.species
 ```
 
+What kind of column is `species`? It's a `StringColumn`!
+
 ```{python}
 type(penguins.species)
 ```
 
+## Ibis "verbs", or, stuff you can do to a table
+
+The rest of this notebook covers some of the general methods you can use to
+alter the output of a particular table.
+
+We'll cover, in order, `filter`, `select`, `drop`, `mutate`, `order_by`,
+`aggregate`, and `group_by`. Time to dive in!
+
 ## Filter
+
+A filter allows you to view a subset of the rows in a table, based on some condition.
+
+For instance, we might want to only view penguin data for the Adelie species:
 
 ```{python}
 penguins.filter(penguins.species == "Adelie")
 ```
 
+You can also combine multiple filters, across multiple columns.
+
+We can subset the data down to Adelie penguins residing on the island of Dream:
+
 ```{python}
 #| scrolled: true
-penguins.filter((penguins.island == "Dream") & (penguins.species == "Adelie"))
+expr = penguins.filter((penguins.island == "Dream") & (penguins.species == "Adelie"))
+expr
 ```
+
+Above we combined two filters using `&`, you can also pass them in as individual arguments:
 
 ```{python}
 expr = penguins.filter(
-    [
         penguins.island == "Dream",
         penguins.species == "Adelie",
-    ]
 )
 expr
 ```
@@ -172,13 +193,23 @@ ibis.to_sql(expr)
 
 ## Select
 
+Filter filters, Select selects (there's a pattern here).
+If you only want a subset of the columns in the original table, you can select
+those columns explicitly.
+
+You can refer to the columns using strings:
+
 ```{python}
 penguins.select("species", "island", "year")
 ```
 
+Or you can use explicit references to the `Column` objects:
+
 ```{python}
 penguins.select(penguins.species, penguins.island, penguins.year)
 ```
+
+Or you can mix and match:
 
 ```{python}
 penguins.select("species", "island", penguins.year)
@@ -186,13 +217,22 @@ penguins.select("species", "island", penguins.year)
 
 ## Drop
 
+Drop is nearly the same as Select, but rather than explicitly choosing the
+columns to display, we explicitly choose the columns to _not_ display.
+
+And as with `select`, you can specify the columns as strings:
+
 ```{python}
 penguins.drop("sex", "year")
 ```
 
+Or you can use explicit references to the `Column` objects:
+
 ```{python}
 penguins.drop(penguins.sex, penguins.year)
 ```
+
+Or you can mix and match:
 
 ```{python}
 penguins.drop("sex", penguins.year)
@@ -203,9 +243,44 @@ penguins.drop("sex", penguins.year)
 Everything we've seen so far has been subtractive -- removing rows or columns.
 What about _adding_ columns?
 
+That's what `mutate` is for!  You can create a new column -- either as a
+function of other existing columns (for example, converting units):
+
 ```{python}
 penguins.mutate(bill_length_cm=penguins.bill_length_mm / 10)
 ```
+
+Or you can create a new column and populate it with some literal value:
+
+```{python}
+penguins.mutate(my_favorite_number=41)
+```
+
+## On immutability
+
+We've filtered, selected, dropped, and mutated this `penguins` table quite a bit.
+
+```{python}
+penguins
+```
+
+And yet, notice that none of our changes persist -- the base table for our query isn't altered.
+The query (or expression) is a recipe of things to do with the base table (`penguins`).
+
+If you want to keep an expression around, you can assign it to a variable:
+
+```{python}
+expr = penguins.select("species", "island")
+expr
+```
+
+**Note**: Every time you execute an expression (via interactive mode, or
+  `to_pandas`, or similar), the entire expression gets executed, starting from
+  the base table.  DuckDB is very fast and this dataset is very small, so the
+  delay is unnoticeable, but for very large datasets, it might become more
+  pronounced.  There is functionality to `cache` intermediate results that isn't
+  covered in this tutorial, but you can read more about it in [the
+  docs](https://ibis-project.org/reference/expression-tables.html#ibis.expr.types.relations.Table.cache).
 
 ## Method chaining
 
@@ -258,11 +333,11 @@ penguins_imperial_select = penguins
 #### Solutions
 
 ```{python}
-%load solutions/nb01-ex01-mutate-drop.py
+# %load solutions/nb01-ex01-mutate-drop.py
 ```
 
 ```{python}
-%load solutions/nb01-ex01-select.py
+# %load solutions/nb01-ex01-select.py
 ```
 
 ### Does it matter which method you choose?
@@ -391,7 +466,7 @@ your solution doesn't look like ours, what's important is that the results are
 the same.
 
 ```{python}
-%load solutions/nb01-ex02.py
+# %load solutions/nb01-ex02.py
 ```
 
 ### Exercise 3
@@ -403,7 +478,25 @@ data collection?
 #### Solution
 
 ```{python}
-%load solutions/nb01-ex03.py
+# %load solutions/nb01-ex03.py
+```
+
+## A brief digression on the SQL Ibis generates
+
+Maybe you've heard that SQL has a standard?  This is true, and also misleading.
+The SQL standard is more of a suggestion, and there are myriad SQL _dialects_.
+
+Ibis compiles expressions into the appropriate SQL dialect for the backend you are using.
+In this case, we started with a DuckDB table, so we get DuckDB SQL:
+
+```{python}
+ibis.to_sql(expr)
+```
+
+But if you want to use a _different_ dialect, you can pass the dialect name:
+
+```{python}
+ibis.to_sql(expr, dialect="postgres")
 ```
 
 ## Some useful extras
@@ -453,5 +546,6 @@ Does what it says on the box -- drop the `NULL`s from a dataset.
 penguins.dropna()
 ```
 
-1: Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. https://allisonhorst.github.io/palmerpenguins/. doi: 10.5281/zenodo.3960218.
-
+1: Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago
+(Antarctica) penguin data. R package version 0.1.0.
+https://allisonhorst.github.io/palmerpenguins/. doi: 10.5281/zenodo.3960218.
