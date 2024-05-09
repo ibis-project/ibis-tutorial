@@ -3,13 +3,14 @@ title: Playing with PyPI (data)
 jupyter: python3
 ---
 
-
-
 Many thanks to Seth M. Larson for making these available: https://github.com/sethmlarson/pypi-data
 
 ## Download data
 
-Note that `DuckDB` supports reading directly from remote parquet files (and performs column-pruning and other optimizations to reduce network load) but we'll be executing several queries against these data and so we're better off downloading the files to begin with.
+Note that `DuckDB` supports reading directly from remote parquet files (and
+performs column-pruning and other optimizations to reduce network load) but
+we'll be executing several queries against these data and so we're better off
+downloading the files to begin with.
 
 ```{python}
 from pathlib import Path
@@ -78,20 +79,24 @@ packages
 
 ## Using `.sql` as an escape hatch
 
-Ibis is pretty good about abstracting away the underlying execution engine, but sometimes you _want_ to talk directly to the engine.
+Ibis is pretty good about abstracting away the underlying execution engine, but
+sometimes you _want_ to talk directly to the engine.
 
 Maybe you:
 - have an existing SQL query from a data engineer that you want to build on
 - need to access a backend-specific function that isn't exposed in Ibis
 - really want to write some SQL
 
-If you do, then you can call `.sql` on a connection (or an existing expression!) and write out your SQL query.
+If you do, then you can call `.sql` on a connection (or an existing expression!)
+and write out your SQL query.
 
-(You can even pass a `dialect` flag if you are more comfortable writing SQL in a dialect different than the one your engine expects!)
+(You can even pass a `dialect` flag if you are more comfortable writing SQL in a
+dialect different than the one your engine expects!)
 
 ### Looking for typo squatters
 
-DuckDB has a `jaccard` function for doing Jaccard similarity checks on strings.  But there's no `jaccard` method in `ibis` -- what to do?  
+DuckDB has a `jaccard` function for doing Jaccard similarity checks on strings.
+But there's no `jaccard` method in `ibis` -- what to do?
 
 We'll write a short SQL query:
 
@@ -110,7 +115,8 @@ expr
 
 We should probably sort that `sim` column to see which packages have higher similarity.
 
-Even though we called out to `sql` for the Jaccard function call, we don't need to stay in SQL-land moving forward, just chain as usual!
+Even though we called out to `sql` for the Jaccard function call, we don't need
+to stay in SQL-land moving forward, just chain as usual!
 
 ```{python}
 expr.order_by(_.sim.desc())
@@ -118,8 +124,9 @@ expr.order_by(_.sim.desc())
 
 ### Exercise 1
 
-Try swapping out `jaccard` for a different similarity function available in DuckDB (https://duckdb.org/docs/sql/functions/char#text-similarity-functions) -- or you can try looking for similar PyPI usernames using the `maintainers` table!
-
+Try swapping out `jaccard` for a different similarity function available in
+DuckDB (https://duckdb.org/docs/sql/functions/char#text-similarity-functions) --
+or you can try looking for similar PyPI usernames using the `maintainers` table!
 
 ### Solution
 
@@ -134,13 +141,72 @@ One possible solution:
 %load solutions/nb03_ex01_maint.py
 ```
 
+## Are there limits on what what you can pass to `.sql`?
+
+There are, but they are generous limits. Call to `.sql` are also deferred so we
+need to know the `schema` of the result. This allows you to continue chaining
+methods after a `.sql` call without executing the full query.
+
+Because of this, the results of `.sql` need to be a table.
+
+But you can do some pretty interesting things with this -- here's a _recursive
+common table expression_ that looks up recursively-dependend-upon packages.
+
+```{python}
+from ibis import _
+```
+
+```{python}
+expr = con.sql("""WITH RECURSIVE
+direct_deps(package, dependency) AS (
+  SELECT
+    package_name,
+    dep_name
+  FROM deps
+  WHERE
+    extra IS NULL
+),
+transitive_deps(package, intermediate, dependency) AS (
+  SELECT
+    package,
+    package,
+    dependency
+  FROM direct_deps
+  UNION
+  SELECT
+    transitive_deps.package,
+    direct_deps.package,
+    direct_deps.dependency
+  FROM direct_deps
+  JOIN transitive_deps
+    ON direct_deps.package = transitive_deps.dependency
+)
+SELECT
+*
+FROM transitive_deps
+""")
+expr
+```
+
+```{python}
+recursive_dependents = (
+    expr.group_by(_.dependency)
+    .agg(n_dependents=_.package.nunique())
+    .order_by(_.n_dependents.desc())
+    .select(name=_.dependency, n_dependents=_.n_dependents)
+)
+recursive_dependents
+````
+
 ## Integration with other tools
 
-Plotting data is quite helpful!  Recent support for the `__dataframe__` protocol has made it easier than ever to use Ibis with various plotting libraries.
+Plotting data is quite helpful!  Recent support for the `__dataframe__` protocol
+has made it easier than ever to use Ibis with various plotting libraries.
 
 ### Histogram of maintainer count
 
-We'll start by computing the number of packages that have `n` maintainers, as defined by having write permissions on PyPI.
+We'll start by computing the number of packages that have `n` maintainers, as
+defined by having write permissions on PyPI.
 
 ```{python}
 maintainer_counts = (
@@ -191,13 +257,15 @@ from plotnine import aes, geom_histogram, ggplot, scale_y_log10, geom_bar
 )
 ```
 
-Finally, since we can always call `to_pandas` or `to_pyarrow` -- it's easy to connect an Ibis result to your favorite PyData tools.
+Finally, since we can always call `to_pandas` or `to_pyarrow` -- it's easy to
+connect an Ibis result to your favorite PyData tools.
 
 ### Exercise 2
 
 What's the deal with that spike at 12 maintainers?
 
-**Note**: if you would like to return more rows in interactive mode, you can set the row-count e.g. `ibis.options.repr.interactive.max_rows = 20`
+**Note**: if you would like to return more rows in interactive mode, you can set
+  the row-count e.g. `ibis.options.repr.interactive.max_rows = 20`
 
 
 ### Solution
