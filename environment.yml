@@ -9,3 +9,4 @@ dependencies:
   - jupyterlab >=4.2.0,<4.3
   - altair >=5.3.0,<5.4
   - plotnine >=0.13.5,<0.14
+  - plotly >=5.22
