@@ -1,6 +1,5 @@
 ---
-title: Get a DuckDB connection
-jupyter: python3
+title: Ibis demo
 ---
 
 ```{python}
@@ -8,7 +7,7 @@ import ibis
 from ibis import *
 ```
 
-
+## Get a DuckDB connection
 
 ```{python}
 con = ibis.duckdb.connect()
@@ -46,7 +45,7 @@ ratings.to_pyarrow(limit=10)
 ```
 
 ```{python}
-#to show this we will need to install polars 
+#to show this we will need to install polars
 #basics.to_polars()
 ```
 
@@ -158,8 +157,8 @@ basics.is_adult.value_counts()
 ```
 
 ```{python}
-basics = basics.filter([basics.title_type == "movie", basics.is_adult == 0]).select("tconst", 
-                                                                                    "primary_title", 
+basics = basics.filter([basics.title_type == "movie", basics.is_adult == 0]).select("tconst",
+                                                                                    "primary_title",
                                                                                     )
 ```
 
@@ -242,5 +241,3 @@ expr2.execute(limit=10)
 ```{python}
 #con3.execute(topfilms, limit=10)
 ```
-
-
