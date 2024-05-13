@@ -220,4 +220,17 @@ topfilms
 topfilms.execute(limit=10)
 ```
 
-Ya está! Eso es Ibis!
+```{python}
+pgcon = ibis.postgres.connect()
+pgcon.list_tables()
+```
+
+Ejecutamos la misma expresión en Postgres:
+
+```{python}
+pgcon.execute(topfilms)
+```
+
+Ya está! Y eso es Ibis!
+
+Ibis tiene muchos backends como Snowflake, DuckDB (lo que está aquí), y más.
