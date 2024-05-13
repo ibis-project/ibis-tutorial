@@ -44,12 +44,6 @@ ratings
 basics
 ```
 
-Ahora, ejecutamos con un límite
-
-```{python}
-ratings.execute(limit=10)
-```
-
 Ibis funciona con muchos formatos en memoria, incluyendo Pandas y PyArrow
 
 ```{python}
