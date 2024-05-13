@@ -17,9 +17,12 @@ con = ibis.duckdb.connect()
 
 ## Cargar unos datos adentro de las tablas
 
+!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_ratings_basics.parquet'
+!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet'
+
 ```{python}
-ratings = con.read_parquet("data/imdb_title_ratings.parquet", table_name="ratings")
-basics = con.read_parquet("data/imdb_title_basics.parquet", table_name="basics")
+ratings = con.read_parquet("imdb_title_ratings.parquet", table_name="imdb_title_ratings")
+basics = con.read_parquet("imdb_title_basics.parquet", table_name="ibis_title_basics")
 ```
 
 Podemos presentar los nombres de las tablas
