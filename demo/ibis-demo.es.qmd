@@ -180,7 +180,7 @@ basics
 Ahora, unimos la tabla `basics` y la tabla `ratings` con la columna `tconst`, y ejecutamos.
 
 ```{python}
-basics.join(ratings, "tconst").execute(limit=10)
+basics.join(ratings, "tconst").to_pandas(limit=10)
 ```
 
 Ordenamos por `avg_rating`
@@ -212,7 +212,7 @@ topfilms
 ```
 
 ```{python}
-topfilms.execute(limit=10)
+topfilms.to_pandas(limit=10)
 ```
 
 ## ¡Ejecutamos la misma expresión en Postgres!
@@ -240,7 +240,7 @@ pgcon.list_tables()
 Ejecutamos la misma expresión en Postgres:
 
 ```{python}
-pgcon.execute(topfilms)
+pgcon.to_pandas(topfilms)
 ```
 
 ¡Ya está, y eso es Ibis!
