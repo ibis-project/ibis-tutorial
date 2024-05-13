@@ -57,12 +57,7 @@ basics.to_pandas(limit=10)
 ratings.to_pyarrow(limit=10)
 ```
 
-Y Polars, si usted lo tiene installado.
-
-```{python}
-#to show this we will need to install polars
-#basics.to_polars()
-```
+Y Polars con el método `to_polars()`, si ustedes lo tienen installado.
 
 ## Columnas con nombres adecuados, y modo interactivo.
 
