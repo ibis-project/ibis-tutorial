@@ -17,12 +17,15 @@ con = ibis.duckdb.connect()
 
 ## Cargar unos datos adentro de las tablas
 
-!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_ratings_basics.parquet'
+
+```{python}
+!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_ratings.parquet'
 !curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet'
+```
 
 ```{python}
 ratings = con.read_parquet("imdb_title_ratings.parquet", table_name="imdb_title_ratings")
-basics = con.read_parquet("imdb_title_basics.parquet", table_name="ibis_title_basics")
+basics = con.read_parquet("imdb_title_basics.parquet", table_name="imdb_title_basics")
 ```
 
 Podemos presentar los nombres de las tablas
@@ -58,6 +61,10 @@ ratings.to_pyarrow(limit=10)
 ```
 
 Y Polars con el método `to_polars()`, si ustedes lo tienen installado.
+
+```{python}
+ratings.to_polars(limit=10)
+```
 
 ## Columnas con nombres adecuados, y modo interactivo.
 
@@ -134,7 +141,7 @@ con.sql("""
         "t0"."tconst",
         CAST("t0"."averageRating" AS VARCHAR) AS "avg_rating",
         CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
-        FROM "ratings" AS "t0"
+        FROM "imdb_title_ratings" AS "t0"
     """)
 ```
 
@@ -144,7 +151,7 @@ con.sql("""
         "t0"."tconst",
         CAST("t0"."averageRating" AS VARCHAR) AS "avg_rating",
         CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
-        FROM "ratings" AS "t0"
+        FROM "imdb_title_ratings" AS "t0"
     """).execute()
 ```
 
@@ -158,7 +165,7 @@ con.sql("""
         "t0"."tconst",
         CAST("t0"."averageRating" AS VARCHAR) AS "avg_rating",
         CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
-        FROM "ratings" AS "t0"
+        FROM "imdb_title_ratings" AS "t0"
     """)
 ```
 
@@ -223,6 +230,13 @@ topfilms.execute(limit=10)
 ```{python}
 pgcon = ibis.postgres.connect()
 pgcon.list_tables()
+```
+
+## Cargar los datos adentro de Postgres
+
+```{python}
+!psql < create_imdb.sql
+!duckdb < load_imdb.sql
 ```
 
 Ejecutamos la misma expresión en Postgres:
