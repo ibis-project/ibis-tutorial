@@ -243,6 +243,6 @@ Ejecutamos la misma expresión en Postgres:
 pgcon.execute(topfilms)
 ```
 
-Ya está! Y eso es Ibis!
+¡Ya está, y eso es Ibis!
 
 Ibis tiene muchos backends como Snowflake, DuckDB (lo que está aquí), y más.
