@@ -30,6 +30,14 @@ You can also run the tutorial locally!  To do so, you'll want to create a
 virtual environment and then install the tutorial dependencies using one of the
 tools below:
 
+### Clone this repository
+
+```sh
+git clone https://github.com/ibis-project/ibis-tutorial.git
+cd ibis-tutorial
+```
+
+
 ### Install dependencies
 
 We recommend using `pixi`, or `conda` / `mamba`, but `pip` works, too! 
@@ -52,11 +60,5 @@ mamba env create -f environment.yml
 
 ```sh
 python -m pip install -r requirements.txt
-```
-
-### Clone this repository
-
-```sh
-git clone https://github.com/ibis-project/ibis-tutorial.git
 ```
 
