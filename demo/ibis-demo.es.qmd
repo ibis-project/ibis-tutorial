@@ -34,7 +34,7 @@ Podemos presentar los nombres de las tablas
 con.list_tables()
 ```
 
-Y las renderizamos:
+Y las renderizamos la expresión abstracta:
 
 ```{python}
 ratings
