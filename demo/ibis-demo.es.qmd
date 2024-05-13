@@ -17,7 +17,6 @@ con = ibis.duckdb.connect()
 
 ## Cargar unos datos adentro de las tablas
 
-
 ```{python}
 !curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_ratings.parquet'
 !curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet'
