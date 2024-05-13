@@ -181,6 +181,8 @@ Para "GROUP BY" con `count()` tenemos el método `value_counts()`
 basics.title_type.value_counts()
 ```
 
+Para nuestros analysis final, limipiaremos unas cosas como seleccionando solo titulos con el tipo "película" y desechando las películas adultos.
+
 ```{python}
 basics = (
     basics
@@ -199,9 +201,13 @@ Ahora, unimos la tabla `basics` y la tabla `ratings` con la columna `tconst`, y 
 basics.join(ratings, "tconst").execute(limit=10)
 ```
 
+Ordenamos por `avg_rating`
+
 ```{python}
 basics.join(ratings, "tconst").order_by(_.avg_rating.desc())
 ```
+
+Y filtramos titulos con votos menos que uno millón.
 
 ```{python}
 basics.join(ratings, "tconst").order_by(_.avg_rating.desc()).filter(_.num_votes > 1e6)
