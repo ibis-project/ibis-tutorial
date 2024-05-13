@@ -181,7 +181,7 @@ Para "GROUP BY" con `count()` tenemos el método `value_counts()`
 basics.title_type.value_counts()
 ```
 
-Para nuestros analysis final, limipiaremos unas cosas como seleccionando solo titulos con el tipo "película" y desechando las películas adultos.
+Para nuestros analysis final, limipiaremos unas cosas como seleccionando solo titulos con el tipo "película" y desechando las películas adultas.
 
 ```{python}
 basics = (
