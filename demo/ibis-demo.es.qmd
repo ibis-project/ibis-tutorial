@@ -235,6 +235,8 @@ topfilms.execute(limit=10)
 
 ## ¡Ejecutamos la misma expresión en Postgres!
 
+### Conectar a Postgres con Ibis
+
 ```{python}
 pgcon = ibis.postgres.connect()
 pgcon.list_tables()
@@ -245,6 +247,12 @@ pgcon.list_tables()
 ```{python}
 !psql < create_imdb.sql
 !duckdb < load_imdb.sql
+```
+
+### Ahora, asegurar que las tablas existan
+
+```{python}
+pgcon.list_tables()
 ```
 
 Ejecutamos la misma expresión en Postgres:
