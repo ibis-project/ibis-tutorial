@@ -60,7 +60,7 @@ basics.to_pandas(limit=10)
 ratings.to_pyarrow(limit=10)
 ```
 
-Y Polars con el método `to_polars()`, si ustedes lo tienen installado.
+Y Polars con el método `to_polars()`, si ustedes lo tienen instalado.
 
 ```{python}
 ratings.to_polars(limit=10)
@@ -209,7 +209,7 @@ Ordenamos por `avg_rating`
 basics.join(ratings, "tconst").order_by(_.avg_rating.desc())
 ```
 
-Y filtramos titulos con votos menos que uno millón.
+Y filtramos los títulos con votos menos que un millón.
 
 ```{python}
 basics.join(ratings, "tconst").order_by(_.avg_rating.desc()).filter(_.num_votes > 1e6)
