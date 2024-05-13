@@ -253,7 +253,7 @@ penguins.mutate(bill_length_cm=penguins.bill_length_mm / 10)
 Or you can create a new column and populate it with some literal value:
 
 ```{python}
-penguins.mutate(my_favorite_number=41)
+penguins.mutate(my_favorite_number=ibis.literal(41))
 ```
 
 ## On immutability
