@@ -28,7 +28,7 @@ Podemos presentar los nombres de las tablas
 con.list_tables()
 ```
 
-Y les renderizamos:
+Y las renderizamos:
 
 ```{python}
 ratings
@@ -38,13 +38,13 @@ ratings
 basics
 ```
 
-Ahora, ejecutamos con un limite
+Ahora, ejecutamos con un límite
 
 ```{python}
 ratings.execute(limit=10)
 ```
 
-Ibis funciona con muchas formatos en memoría, se incluye Pandas y PyArrow
+Ibis funciona con muchos formatos en memoria, incluyendo Pandas y PyArrow
 
 ```{python}
 basics.to_pandas(limit=10)
@@ -61,11 +61,11 @@ Y Polars, si usted lo tiene installado.
 #basics.to_polars()
 ```
 
-## Properly named columns and interactive mode
+## Columnas con nombres adecuados, y modo interactivo.
 
-A veces, ustedes tienen columnas que tienen nombres sucios, y así que ustedes les necesitan limpiar.
+A veces, ustedes tienen columnas que tienen nombres sucios, y así que necesitan limpiarlos.
 
-Ibis puede ayudarse con eso.
+Ibis puede ayudarte con eso.
 
 ```{python}
 ibis.options.interactive = True
@@ -110,14 +110,14 @@ ratings = ratings.select(
 
 ## `to_sql()`
 
-Y cuando quiere ver la SQL, tenemos el método `to_sql`:
+Y cuando quiere ver el SQL, tenemos el método `to_sql`:
 
 ```{python}
 ibis.to_sql(ratings)
 ```
 
 ```{python}
-ibis.to_sql(ratings, dialect="sqlite") # this will show different types in casting when casting makes sense
+ibis.to_sql(ratings, dialect="sqlite")
 ```
 
 ```{python}
@@ -126,7 +126,7 @@ ibis.options.interactive = False
 
 ## `.sql`
 
-El próximo, tenemos el método `.sql()` y este método es para escribiendo SQL crudo:
+Luego, tenemos el método `.sql()` y este método es para escribir SQL crudo:
 
 A veces, usted necesita escribir SQL.
 
@@ -188,7 +188,7 @@ basics = (
 basics
 ```
 
-Ahora, unimos la tabla basics y la tabla ratings con la columna "tconst" y entonces ejecutarlo.
+Ahora, unimos la tabla `basics` y la tabla `ratings` con la columna `tconst`, y ejecutamos.
 
 ```{python}
 basics.join(ratings, "tconst").execute(limit=10)
@@ -202,9 +202,9 @@ basics.join(ratings, "tconst").order_by(_.avg_rating.desc())
 basics.join(ratings, "tconst").order_by(_.avg_rating.desc()).filter(_.num_votes > 1e6)
 ```
 
-## `join` tables
+## Unión de tablas (`join`)
 
-Finalmente, mostramos la expreción entero para computar las películas arribas diez.
+Finalmente, mostramos la expresión entera para computar las diez mejores películas.
 
 ```{python}
 topfilms = basics.join(ratings, "tconst").order_by(_.avg_rating.desc()).filter(_.num_votes > 1e6)
