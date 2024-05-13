@@ -227,12 +227,14 @@ topfilms
 topfilms.execute(limit=10)
 ```
 
+## ¡Ejecutamos la misma expresión en Postgres!
+
 ```{python}
 pgcon = ibis.postgres.connect()
 pgcon.list_tables()
 ```
 
-## Cargar los datos adentro de Postgres
+### Poner los datos adentro de Postgres
 
 ```{python}
 !psql < create_imdb.sql
