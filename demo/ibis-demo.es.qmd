@@ -112,7 +112,7 @@ A veces, usted necesita escribir SQL.
 con.sql("""
         SELECT
         "t0"."tconst",
-        CAST("t0"."averageRating" AS VARCHAR) AS "avg_rating",
+        CAST("t0"."averageRating" AS VARCHAR) AS "average_rating",
         CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
         FROM "imdb_title_ratings" AS "t0"
     """)
@@ -122,7 +122,7 @@ con.sql("""
 con.sql("""
         SELECT
         "t0"."tconst",
-        CAST("t0"."averageRating" AS VARCHAR) AS "avg_rating",
+        CAST("t0"."averageRating" AS VARCHAR) AS "average_rating",
         CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
         FROM "imdb_title_ratings" AS "t0"
     """).execute()
@@ -136,7 +136,7 @@ ibis.options.interactive = True
 con.sql("""
         SELECT
         "t0"."tconst",
-        CAST("t0"."averageRating" AS VARCHAR) AS "avg_rating",
+        CAST("t0"."averageRating" AS VARCHAR) AS "average_rating",
         CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
         FROM "imdb_title_ratings" AS "t0"
     """)
@@ -177,16 +177,16 @@ Ahora, unimos la tabla `basics` y la tabla `ratings` con la columna `tconst`, y 
 basics.join(ratings, "tconst").to_pandas(limit=10)
 ```
 
-Ordenamos por `avg_rating`
+Ordenamos por `average_rating`
 
 ```{python}
-basics.join(ratings, "tconst").order_by(_.avg_rating.desc())
+basics.join(ratings, "tconst").order_by(_.average_rating.desc())
 ```
 
 Y filtramos los títulos con votos menos que un millón.
 
 ```{python}
-basics.join(ratings, "tconst").order_by(_.avg_rating.desc()).filter(_.num_votes > 1e6)
+basics.join(ratings, "tconst").order_by(_.average_rating.desc()).filter(_.num_votes > 1e6)
 ```
 
 ## Unión de tablas (`join`)
@@ -194,7 +194,7 @@ basics.join(ratings, "tconst").order_by(_.avg_rating.desc()).filter(_.num_votes 
 Finalmente, mostramos la expresión entera para computar las diez mejores películas.
 
 ```{python}
-topfilms = basics.join(ratings, "tconst").order_by(_.avg_rating.desc()).filter(_.num_votes > 1e6)
+topfilms = basics.join(ratings, "tconst").order_by(_.average_rating.desc()).filter(_.num_votes > 1e6)
 ```
 
 ```{python}
