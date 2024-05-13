@@ -92,27 +92,6 @@ ratings
 basics
 ```
 
-## Casting
-
-```{python}
-ratings.select(avg_rating=ratings.average_rating.cast("float"))
-```
-
-```{python}
-ratings.select(
-    avg_rating=ratings.average_rating.cast("float"),
-    num_votes=ratings.num_votes.cast("int"),
-)
-```
-
-```{python}
-ratings = ratings.select(
-    ratings.tconst,
-    avg_rating=ratings.average_rating.cast("float"),
-    num_votes=ratings.num_votes.cast("int"),
-)
-```
-
 ## `to_sql()`
 
 Y cuando quiere ver el SQL, tenemos el funcion `to_sql`:
