@@ -115,7 +115,7 @@ ratings = ratings.select(
 
 ## `to_sql()`
 
-Y cuando quiere ver el SQL, tenemos el método `to_sql`:
+Y cuando quiere ver el SQL, tenemos el funcion `to_sql`:
 
 ```{python}
 ibis.to_sql(ratings)
