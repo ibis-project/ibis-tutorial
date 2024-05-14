@@ -10,7 +10,7 @@ See the [README](https://github.com/ibis-project/ibis-tutorial#setup) for up-to-
 
 ## Download some data
 
-There are other ways to get example data, but we'll start by downloading the penguins dataset
+There are other ways to get example data, but we'll start by downloading the penguins dataset.
 $^1$.
 
 ```{python}
@@ -110,7 +110,7 @@ the important point is that Ibis is deferred.
 
 ## Interactive Mode
 
-Remmeber when we said Ibis is deferred? Sometimes you want eager execution so
+Remember when we said Ibis is deferred? Sometimes you want eager execution so
 you can explore a dataset.  For most of this tutorial, we'll turn on
 `interactive` mode, where Ibis will eagerly execute as much of the query as it
 needs to in order to show you the first 10 rows of the result.
@@ -243,7 +243,7 @@ penguins.drop("sex", penguins.year)
 Everything we've seen so far has been subtractive -- removing rows or columns.
 What about _adding_ columns?
 
-That's what `mutate` is for!  You can create a new column -- either as a
+That's what `mutate` is for! You can create a new column -- either as a
 function of other existing columns (for example, converting units):
 
 ```{python}
@@ -355,7 +355,7 @@ ibis.to_sql(penguins_imperial_select)
 
 In practice, small differences in the generated SQL don't make a difference.
 Any modern SQL execution engine will optimize variations to the same set of
-operations and there will be no measureable performance difference.
+operations and there will be no measurable performance difference.
 
 ## Order By
 
