@@ -1,6 +1,9 @@
----
-title: Demo de Ibis
----
+# Demo de Ibis
+
+```{python}
+!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_ratings.parquet'
+!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet'
+```
 
 Primero, importar Ibis:
 
@@ -9,31 +12,22 @@ import ibis
 from ibis import *
 ```
 
-## Conectar a DuckDB
+## Conectar a DuckDB y crear tablas
 
 ```{python}
 con = ibis.duckdb.connect()
-```
 
-## Cargar unos datos adentro de las tablas
-
-```{python}
-!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_ratings.parquet'
-!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet'
-```
-
-```{python}
 ratings = con.read_parquet("imdb_title_ratings.parquet", table_name="imdb_title_ratings")
 basics = con.read_parquet("imdb_title_basics.parquet", table_name="imdb_title_basics")
 ```
 
-Podemos presentar los nombres de las tablas
+Podemos listar los nombres de las tablas
 
 ```{python}
 con.list_tables()
 ```
 
-Y renderizamos un versión abstracta de la expresión con nombres columnas y tipos:
+Y renderizamos un versión abstracta de la expresión con los nombres de las columnas y sus tipos:
 
 ```{python}
 ratings
@@ -85,23 +79,26 @@ ratings
 basics
 ```
 
-## `to_sql()`
+## `ibis.to_sql()`
 
-Y cuando quiere ver el SQL, tenemos el funcion `to_sql`:
+Y cuando quiere ver el SQL, tenemos la función `to_sql`:
 
 ```{python}
-ibis.to_sql(ratings)
+expr = ratings.average_rating.round().cast("float64").name("round")
+ibis.to_sql(expr)
 ```
 
+Podemos usar
+
 ```{python}
-ibis.to_sql(ratings, dialect="sqlite")
+ibis.to_sql(expr, dialect="postgres")
 ```
 
 ```{python}
 ibis.options.interactive = False
 ```
 
-## `.sql`
+## `con.sql()`
 
 Luego, tenemos el método `.sql()` y este método es para escribir SQL crudo:
 
@@ -109,22 +106,22 @@ A veces, usted necesita escribir SQL.
 
 ```{python}
 con.sql("""
-        SELECT
-        "t0"."tconst",
-        CAST("t0"."averageRating" AS VARCHAR) AS "average_rating",
-        CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
-        FROM "imdb_title_ratings" AS "t0"
-    """)
+    SELECT
+    "tconst",
+    CAST("averageRating" AS VARCHAR) AS "average_rating",
+    CAST("numVotes" AS VARCHAR) AS "num_votes"
+    FROM "imdb_title_ratings"
+""")
 ```
 
 ```{python}
 con.sql("""
-        SELECT
-        "t0"."tconst",
-        CAST("t0"."averageRating" AS VARCHAR) AS "average_rating",
-        CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
-        FROM "imdb_title_ratings" AS "t0"
-    """).execute()
+    SELECT
+    "tconst",
+    CAST("averageRating" AS VARCHAR) AS "average_rating",
+    CAST("numVotes" AS VARCHAR) AS "num_votes"
+    FROM "imdb_title_ratings"
+""").to_pandas()
 ```
 
 ```{python}
@@ -133,12 +130,12 @@ ibis.options.interactive = True
 
 ```{python}
 con.sql("""
-        SELECT
-        "t0"."tconst",
-        CAST("t0"."averageRating" AS VARCHAR) AS "average_rating",
-        CAST("t0"."numVotes" AS VARCHAR) AS "num_votes"
-        FROM "imdb_title_ratings" AS "t0"
-    """)
+    SELECT
+    "tconst",
+    CAST("averageRating" AS VARCHAR) AS "average_rating",
+    CAST("numVotes" AS VARCHAR) AS "num_votes"
+    FROM "imdb_title_ratings"
+""")
 ```
 
 ## Otras operaciones
@@ -153,8 +150,9 @@ Para "GROUP BY" con `count()` tenemos el método `value_counts()`
 basics.title_type.value_counts()
 ```
 
-Para nuestros análisis final, vamos a limipiar unas cosas como seleccionando
-solo títulos con el tipo "película" y desechando las películas adultas.
+Para nuestro análisis final, vamos a limipiar unas cosas.
+
+Vamos a seleccionar solo títulos con el tipo "movie" (película) y desechar las películas adultas.
 
 Hacemos esto con una lista de predicados:
 
@@ -170,7 +168,7 @@ basics = (
 basics
 ```
 
-Ahora, unimos la tabla `basics` y la tabla `ratings` con la columna `tconst`, y ejecutamos.
+Ahora, unimos la tabla `basics` y la tabla `ratings` usando la columna `tconst`, y ejecutamos.
 
 ```{python}
 basics.join(ratings, "tconst").to_pandas(limit=10)
@@ -182,7 +180,7 @@ Ordenamos por `average_rating`
 basics.join(ratings, "tconst").order_by(_.average_rating.desc())
 ```
 
-Y filtramos los títulos con votos menos que un millón.
+Y filtramos los títulos con votos más que un millón.
 
 ```{python}
 basics.join(ratings, "tconst").order_by(_.average_rating.desc()).filter(_.num_votes > 1e6)
@@ -193,7 +191,11 @@ basics.join(ratings, "tconst").order_by(_.average_rating.desc()).filter(_.num_vo
 Finalmente, mostramos la expresión entera para computar las diez mejores películas.
 
 ```{python}
-topfilms = basics.join(ratings, "tconst").order_by(_.average_rating.desc()).filter(_.num_votes > 1e6)
+topfilms = (
+    basics.join(ratings, "tconst")
+    .order_by(_.average_rating.desc())
+    .filter(_.num_votes > 1e6)
+)
 ```
 
 ```{python}
@@ -224,7 +226,7 @@ pgcon.list_tables()
 !duckdb < load_imdb.sql
 ```
 
-### Ahora, asegurar que las tablas existan
+### Ahora, chequear que las tablas existan
 
 ```{python}
 pgcon.list_tables()
