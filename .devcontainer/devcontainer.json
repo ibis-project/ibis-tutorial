@@ -19,7 +19,12 @@
         "workbench.welcomePage.walkthroughs.openOnInstall": false,
         "python.defaultInterpreterPath": "/usr/local/bin/python"
       },
-      "extensions": ["ms-toolsai.jupyter", "ms-python.python", "quarto.quarto"]
+      "extensions": [
+        "ms-toolsai.jupyter",
+        "ms-python.python",
+        "quarto.quarto",
+        "donjayamanne.vscode-default-python-kernel"
+      ]
     }
   },
   "features": {
