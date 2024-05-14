@@ -17,7 +17,11 @@
         "update.showReleaseNotes": false,
         "vsicons.dontShowNewVersionMessage": true,
         "workbench.welcomePage.walkthroughs.openOnInstall": false,
-        "python.defaultInterpreterPath": "/usr/local/bin/python"
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "jupyter.kernels.excludePythonEnvironments": [
+          "/usr/bin/python3",
+          "/bin/python3"
+        ]
       },
       "extensions": [
         "ms-toolsai.jupyter",
