@@ -52,7 +52,7 @@ for filename in filenames:
 ```
 
 ```{python}
-!ls
+!ls imdb_smol/
 ```
 
 ### Parquet loading
@@ -62,6 +62,13 @@ in-memory tables. Another common pattern is that you have a few parquet files
 you want to work with. We can load those in to an in-memory DuckDB connection.
 (Note that "in-memory" here just means ephemeral, DuckDB is still very happy to
 operate on as much data as your hard drive can hold)
+
+```{python}
+import ibis
+from ibis import _
+
+ibis.options.interactive = True
+```
 
 ```{python}
 con = ibis.duckdb.connect()
@@ -162,33 +169,58 @@ average rating having received at least 100,000 votes.
 
 ## Expression portability
 
-```{python}
-import os
-
-# this will only work if you have snowflake credentials set up in this environment variable
-# snowflake_con = ibis.connect(os.getenv("SNOWFLAKE_URL"))
-```
-
-Note that for demo purposes, we've preloaded these tables into our Snowflake
-account. But if you wanted to add them to your Snowflake account, you could
-make use of `read_parquet` or similar!
-
-```{python}
-# snowflake_con.list_tables(like="imdb")
-```
+Let's turn off interactive mode for a moment.
 
 ```{python}
 ibis.options.interactive = False
 ```
 
+We've built up an Ibis expression that returns the top 10 highest rated films on
+IMDB for certain criteria.  The data we used is only a 5% sample, but the query
+should work no matter what size the data are.
+
+Now we're going to call a special `unbind` method.
+
 ```{python}
-# expr = sol4.unbind()
+expr = sol4.unbind()
+```
+
+What does `unbind` do?  It takes an Ibis expression that was created using one
+backend (in our case, `DuckDB`) and generalizes it into an "unbound" expression.
+
+Let's look at the `repr` of the unbound expression (this will error if you have
+interactive mode on, that's why we turned it off).
+
+```{python}
+expr
+```
+
+The only visible difference is that we see "UnboundTable" a bunch of times, and
+that's the point.  The _expression_ is independent of the backend that created
+it.
+
+So, if we had a _different_ backend connection, that had the full IMDB ratings
+data loaded into it, could we run our locally developed query against the
+"production" data?
+
+(With caveats that the table names and schema need to match).
+
+Let's find out!
+
+```{python}
+pg_con = ibis.postgres.connect()
 ```
 
 ```{python}
-# expr
+pg_con.list_tables()
 ```
 
+That seems promising.
+
+Now, we can't call `expr.to_pandas()` because the expression isn't _bound_ to a
+backend.  Ibis doesn't know (anymore) where to execute it. Instead, we can use
+the `to_pandas` (or similar) method on the backend connection object itself:
+
 ```{python}
-# snowflake_con.execute(expr).head(10)
+pg_con.to_pandas(expr, limit=10)
 ```
