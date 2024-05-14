@@ -334,7 +334,7 @@ Write a UDF that grabs this information, and if it is present, pull out the `ali
 
 Here is a sample API response for a known vulnerability:
 
-```
+```http
 GET /pypi/Django/3.0.2/json HTTP/1.1
 Host: pypi.org
 Accept: application/json
