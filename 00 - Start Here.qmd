@@ -13,12 +13,14 @@ Let's kick things off by loading some PyPI package data into a local PostgreSQL 
 We will do this using DuckDB, yes you can do that! 
 
 ```{python}
-!duckdb < load.sql
+!duckdb < load_pypi.sql
+!psql < demo/create_imdb.sql
+!duckdb < demo/load_imdb.sql
 ```
 
 And we'll confirm that our PostgreSQL database contains the tables we just loaded.
 
 ```{python}
-!psql <<< '\dt'
+!psql << '\dt'
 !psql < verify.sql
 ```
