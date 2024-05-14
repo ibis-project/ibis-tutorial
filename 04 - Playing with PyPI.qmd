@@ -5,12 +5,19 @@ jupyter: python3
 
 Many thanks to Seth M. Larson for making these available: https://github.com/sethmlarson/pypi-data
 
-## Download data
+```{python}
+import ibis
+from ibis import _
 
-Note that `DuckDB` supports reading directly from remote parquet files (and
-performs column-pruning and other optimizations to reduce network load) but
-we'll be executing several queries against these data and so we're better off
-downloading the files to begin with.
+ibis.options.interactive = True
+```
+
+```{python}
+con = ibis.duckdb.connect()
+```
+
+We earlier downloaded some PyPI maintainer data as parquet files, now let's load
+them into DuckDB:
 
 ```{python}
 from pathlib import Path
@@ -25,35 +32,15 @@ filenames = [
 ]
 
 folder = Path("pypi")
-folder.mkdir(exist_ok=True)
 
-for filename in filenames:
-    path = folder / filename
-    if not path.exists():
-        import urllib.request
-
-        urllib.request.urlretrieve(
-            f"https://storage.googleapis.com/ibis-tutorial-data/pypi/2024-04-24/{filename}",
-            path,
-        )
-```
-
-```{python}
-import ibis
-from ibis import _
-
-ibis.options.interactive = True
-```
-
-```{python}
-con = ibis.duckdb.connect()
-```
-
-```{python}
 for filename in filenames:
     path = folder / filename
     con.read_parquet(path, table_name=filename.split(".")[0])
 ```
+
+There should be several tables available -- we'll be focusing on using the
+`deps`, `maintainers`, and `packages` tables:
+
 
 ```{python}
 con.list_tables()
@@ -77,6 +64,98 @@ packages = con.tables.packages
 packages
 ```
 
+## Looking for typo squatters
+
+We've all done it, you typo in your `pip install` line and you end up with...
+something else. Most of the time, these are honest mistakes.  There are a LOT of
+packages.
+
+Sometimes, it is... less honest.
+
+There is a `levenshtein` method for calculating string similarity against a string column.
+Let's try that out and see if there are any packages similarly named to, say, `pandas`:
+
+```{python}
+packages.select("name", sim=packages.name.levenshtein("pandas")).order_by(_.sim)
+```
+
+Those seem like they are probably legitimate projects -- maybe we can try out another text similarity search?
+
+There's a `jaccard` search function in DuckDB, but there's no `jaccard` method on Ibis' string columns...
+
+What's an enterprising Ibis user to do?
+
+## UDF builtins
+
+Modern SQL engines have a _lot_ of features and while Ibis provides a consistent
+interface, it can't always expose every option of _every_ backend.
+
+One easy way to enable extra backend functionality is with a udf builtin!
+
+If a function exists on a particular backend (this is backend-specific by
+definition), you can create a dummy function that maps the name, the inputs, and
+the output type for Ibis to use.
+
+The Jaccard function on DuckDB takes in two strings and returns the similarity
+measure as a number between 0 and 1. To enable this in Ibis, we need to make use
+of a handy decorator, make sure the function name matches, and add a return type
+hint (this is required).
+
+```{python}
+@ibis.udf.scalar.builtin
+def jaccard(left: str, right: str) -> float:
+    ...
+```
+
+Now that that's defined, we can use our newly exposed `jaccard` function -- not
+as a method on the `name` column, but by passing the column as one of the
+arguments:
+
+```{python}
+packages.select("name", sim=jaccard(packages.name, "pandas")).order_by(_.sim.desc())
+```
+
+### Exercise 1
+
+Try swapping out `jaccard` for a different similarity function available in
+DuckDB (https://duckdb.org/docs/sql/functions/char#text-similarity-functions).
+
+### Solution
+
+One possible solution:
+
+```{python}
+%load solutions/nb04_ex01_jaro.py
+```
+
+## Exploring the PyPI maintainers dataset further
+
+### Exercise 2: Which maintainers have the most downloads?
+
+Which package maintainers on PyPI have the most downloads across all the
+packages they maintain?
+
+
+### Solution
+
+```{python}
+#| scrolled: true
+%load solutions/nb04_ex02.py
+```
+
+### Exercise 3: What packages depend on `ibis-framework`?
+
+Or fill in your package name of choice
+
+(You can use the `distinct` method to return a table with duplicate entries removed.)
+
+
+### Solution
+
+```{python}
+%load solutions/nb04_ex03.py
+```
+
 ## Using `.sql` as an escape hatch
 
 Ibis is pretty good about abstracting away the underlying execution engine, but
@@ -90,58 +169,43 @@ Maybe you:
 If you do, then you can call `.sql` on a connection (or an existing expression!)
 and write out your SQL query.
 
-(You can even pass a `dialect` flag if you are more comfortable writing SQL in a
-dialect different than the one your engine expects!)
-
-### Looking for typo squatters
-
-DuckDB has a `jaccard` function for doing Jaccard similarity checks on strings.
-But there's no `jaccard` method in `ibis` -- what to do?
-
-We'll write a short SQL query:
+Let's try out a few straightforward examples:
 
 ```{python}
-# packages.name.jaccard("pandas")  # <--this is not a thing (yet!)
+con.sql("SELECT 1 + 1")
 ```
+
+This isn't a necessarily a _good_ way to do math, but it's available!
 
 ```{python}
-expr = packages.sql(
-    "SELECT name, version, jaccard(packages.name, 'pandas') as sim from packages",
-    dialect="duckdb",
-)  # the dialect keyword is redundant here
-
-expr
+con.sql("SELECT 1 + 1 as f")
 ```
 
-We should probably sort that `sim` column to see which packages have higher similarity.
-
-Even though we called out to `sql` for the Jaccard function call, we don't need
-to stay in SQL-land moving forward, just chain as usual!
+Now that the column of our simple addition has a name, we can chain on the
+expression, the same as any other Ibis expression.
 
 ```{python}
-expr.order_by(_.sim.desc())
+con.sql("SELECT 1 + 1 as f").mutate(f=_.f + 2)
 ```
 
-### Exercise 1
-
-Try swapping out `jaccard` for a different similarity function available in
-DuckDB (https://duckdb.org/docs/sql/functions/char#text-similarity-functions) --
-or you can try looking for similar PyPI usernames using the `maintainers` table!
-
-### Solution
-
-One possible solution:
+You can (should you so desire) continue to hop back-and-forth from Ibis land to SQL land:
 
 ```{python}
-%load solutions/nb03_ex01_jaro.py
+con.sql("SELECT 1 + 1 as f").mutate(f=_.f + 2).alias("t").sql("SELECT f, f^2 AS fsquared FROM t")
 ```
+
+That... doesn't look right. What happened?
+
+Postgres uses the caret symbol (`^`) for `pow`, but DuckDB doesn't. But we don't
+have to rewrite it, just let Ibis know that it's written in a different dialect:
 
 ```{python}
-#| scrolled: true
-%load solutions/nb03_ex01_maint.py
+con.sql("SELECT 1 + 1 as f").mutate(f=_.f + 2).alias("t").sql("SELECT f, f^2 AS fsquared FROM t", dialect="postgres")
 ```
 
-## Are there limits on what what you can pass to `.sql`?
+### Exercise 4: Find the top 20 most transitively depended on packages
+
+#### Are there limits on what what you can pass to `.sql`?
 
 There are, but they are generous limits. Call to `.sql` are also deferred so we
 need to know the `schema` of the result. This allows you to continue chaining
@@ -150,11 +214,7 @@ methods after a `.sql` call without executing the full query.
 Because of this, the results of `.sql` need to be a table.
 
 But you can do some pretty interesting things with this -- here's a _recursive
-common table expression_ that looks up recursively-dependend-upon packages.
-
-```{python}
-from ibis import _
-```
+common table expression_ that looks up transitive dependencies.
 
 ```{python}
 expr = con.sql("""WITH RECURSIVE
@@ -188,24 +248,20 @@ FROM transitive_deps
 expr
 ```
 
+Now, given this recursive CTE, can we determine the top 20 most transitively
+depended on packages?
+
+### Solution
+
 ```{python}
-recursive_dependents = (
-    expr.group_by(_.dependency)
-    .agg(n_dependents=_.package.nunique())
-    .order_by(_.n_dependents.desc())
-    .select(name=_.dependency, n_dependents=_.n_dependents)
-)
-recursive_dependents
+%load solutions/nb04_ex04.py
 ```
 
-## Integration with other tools
-
-Plotting data is quite helpful!  Recent support for the `__dataframe__` protocol
-has made it easier than ever to use Ibis with various plotting libraries.
+## Additional exercises
 
 ### Histogram of maintainer count
 
-We'll start by computing the number of packages that have `n` maintainers, as
+Start by computing the number of packages that have `n` maintainers, as
 defined by having write permissions on PyPI.
 
 ```{python}
@@ -224,12 +280,6 @@ We'll plot a histogram of the maintainer counts using `altair`.
 
 ```{python}
 import altair as alt
-
-alt.__version__
-```
-
-```{python}
-ibis.__version__
 ```
 
 ```{python}
@@ -242,25 +292,7 @@ chart = (
 chart
 ```
 
-We can also use `plotnine`!
-
-```{python}
-from plotnine import aes, geom_histogram, ggplot, scale_y_log10, geom_bar
-```
-
-```{python}
-#| scrolled: true
-(
-    ggplot(maintainer_counts, aes(x="maintainers", y="count"))
-    + geom_bar(stat="identity")
-    + scale_y_log10()
-)
-```
-
-Finally, since we can always call `to_pandas` or `to_pyarrow` -- it's easy to
-connect an Ibis result to your favorite PyData tools.
-
-### Exercise 2
+### Exercise 05
 
 What's the deal with that spike at 12 maintainers?
 
@@ -271,165 +303,13 @@ What's the deal with that spike at 12 maintainers?
 ### Solution
 
 ```{python}
-%load solutions/nb03_ex02_counts.py
+# %load solutions/nb04_ex05_counts.py
 ```
 
 ```{python}
-%load solutions/nb03_ex02_ftw.py
+# %load solutions/nb04_ex05_ftw.py
 ```
 
 ```{python}
-%load solutions/nb03_ex02_ftw_maintainers.py
+# %load solutions/nb04_ex05_ftw_maintainers.py
 ```
-
-## UDFs
-
-Modern SQL engines have a _lot_ of features, but there's always going to be _something_ you want to do that isn't built-in.  Maybe you have a text classifier you want to run over a dataset?
-
-We'll tackle something a little less ML-related, and figure out if we need to update our PyPI data pull.
-
-```{python}
-pp = (
-    packages.order_by(_.downloads.desc())
-    .select("name", "version", "downloads")
-    .limit(10)
-)
-```
-
-```{python}
-pp
-```
-
-```{python}
-from ibis.expr.operations import udf
-```
-
-```{python}
-import json
-
-import requests
-
-
-@udf.scalar.python
-def check_version(name: str, version: str) -> bool:
-    r = requests.get(f"https://pypi.org/pypi/{name}/json")
-    return (
-        version == sorted(list(json.loads(r.content.decode())["releases"].keys()))[-1]
-    )
-```
-
-```{python}
-pp.mutate(is_latest=check_version(pp.name, pp.version))
-```
-
-### Exercise 3
-
-Above we used a UDF to look up whether the version of a given package in our dataset was the latest release on PyPI. 
-
-Let's add another UDF to check whether any of the packages in our top-10 downloads have known vulnerabilities.
-
-The API endpoint for checking vulnerabilities is `"https://pypi.org/pypi/{name}/{version}/json"` -- if you load in the JSON from that `GET`, there is a `vulnerabilities` key that will be a list of known vulnerabilities.
-
-Write a UDF that grabs this information, and if it is present, pull out the `aliases` and `fixed_in` subfields.
-
-Here is a sample API response for a known vulnerability:
-
-```http
-GET /pypi/Django/3.0.2/json HTTP/1.1
-Host: pypi.org
-Accept: application/json
-
-{
-    "info": {},
-    "last_serial": 12089094,
-    "releases": {},
-    "urls": [],
-    "vulnerabilities": [
-        {
-            "aliases": [
-                "CVE-2021-3281"
-            ],
-            "details": "In Django 2.2 before 2.2.18, 3.0 before 3.0.12, and 3.1 before 3.1.6, the django.utils.archive.extract method (used by \"startapp --template\" and \"startproject --template\") allows directory traversal via an archive with absolute paths or relative paths with dot segments.",
-            "summary": "A shorter summary of the vulnerability",
-            "fixed_in": [
-                "2.2.18",
-                "3.0.12",
-                "3.1.6"
-            ],
-            "id": "PYSEC-2021-9",
-            "link": "https://osv.dev/vulnerability/PYSEC-2021-9",
-            "source": "osv",
-            "withdrawn": null
-        },
-    ]
-}
-```
-
-
-### Solution
-
-```{python}
-%load solutions/nb03_ex03.py
-```
-
-## More exercises / questions:
-
-If you've finished all the exercises and still have some time or want to explore using Ibis further, here are some more questions to try to answer using the PyPI data.
-
-### Exercise 4: Which maintainers have the most downloads?
-
-Which package maintainers on PyPI have the most downloads across all the packages they maintain?
-
-
-### Solution
-
-```{python}
-#| scrolled: true
-%load solutions/nb03_ex04.py
-```
-
-### Exercise 5: What packages depend on `ibis-framework`?
-
-Or fill in your package name of choice
-
-
-### Solution
-
-```{python}
-%load solutions/nb03_ex05.py
-```
-
-### Exercise 6: What packages depend on things I maintain?
-
-Do you publish any PyPI packages?  Try looking up which packages depend on those packages.
-Or you can try looking up some of the Ibis maintainers dependency graphs (`gforsyth`, `jcrist`, `Charles.Cloud`)
-
-
-### Solution
-
-```{python}
-%load solutions/nb03_ex06.py
-```
-
-### Exercise 7: What are the top pytest extensions?
-
-We love `pytest` and so do a bunch of other people.  Their plugins/extensions also follow a naming convention that they start with `pytest-`, so try to find out which `pytest` extensions are the most depended on.
-
-
-### Solution
-
-```{python}
-%load solutions/nb03_ex07.py
-```
-
-### Exercise 8: Find the top 20 most depended on packages that have only one maintainer
-
-Sometimes people refer to bus factors, other times we think of someone winning the lottery and moving to a remote cabin in the woods (this is my plan). Which packages would be left without an active maintainer if one person is no longer available to publish?
-
-
-### Solution
-
-```{python}
-%load solutions/nb03_ex08.py
-```
-
