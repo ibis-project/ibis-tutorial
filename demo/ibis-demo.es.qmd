@@ -1,0 +1,247 @@
+# Demo de Ibis
+
+```{python}
+!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_ratings.parquet'
+!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet'
+```
+
+Primero, importar Ibis:
+
+```{python}
+import ibis
+from ibis import *
+```
+
+## Conectar a DuckDB y crear tablas
+
+```{python}
+con = ibis.duckdb.connect()
+
+ratings = con.read_parquet("imdb_title_ratings.parquet", table_name="imdb_title_ratings")
+basics = con.read_parquet("imdb_title_basics.parquet", table_name="imdb_title_basics")
+```
+
+Podemos listar los nombres de las tablas
+
+```{python}
+con.list_tables()
+```
+
+Y renderizamos un versión abstracta de la expresión con los nombres de las columnas y sus tipos:
+
+```{python}
+ratings
+```
+
+```{python}
+basics
+```
+
+Ibis funciona con muchos formatos en memoria, incluyendo Pandas y PyArrow
+
+```{python}
+basics.to_pandas(limit=10)
+```
+
+```{python}
+ratings.to_pyarrow(limit=10)
+```
+
+Y Polars con el método `to_polars()`, si ustedes lo tienen instalado.
+
+```{python}
+ratings.to_polars(limit=10)
+```
+
+## Columnas con nombres adecuados, y modo interactivo.
+
+A veces, ustedes tienen columnas que tienen nombres sucios, y así que necesitan limpiarlos.
+
+Ibis puede ayudarte con eso.
+
+```{python}
+ibis.options.interactive = True
+```
+
+```{python}
+basics = basics.rename("snake_case")
+```
+
+```{python}
+ratings = ratings.rename("snake_case")
+```
+
+```{python}
+ratings
+```
+
+```{python}
+basics
+```
+
+## `ibis.to_sql()`
+
+Y cuando quiere ver el SQL, tenemos la función `to_sql`:
+
+```{python}
+expr = ratings.average_rating.round().cast("float64").name("round")
+ibis.to_sql(expr)
+```
+
+Podemos usar
+
+```{python}
+ibis.to_sql(expr, dialect="postgres")
+```
+
+```{python}
+ibis.options.interactive = False
+```
+
+## `con.sql()`
+
+Luego, tenemos el método `.sql()` y este método es para escribir SQL crudo:
+
+A veces, usted necesita escribir SQL.
+
+```{python}
+con.sql("""
+    SELECT
+    "tconst",
+    CAST("averageRating" AS VARCHAR) AS "average_rating",
+    CAST("numVotes" AS VARCHAR) AS "num_votes"
+    FROM "imdb_title_ratings"
+""")
+```
+
+```{python}
+con.sql("""
+    SELECT
+    "tconst",
+    CAST("averageRating" AS VARCHAR) AS "average_rating",
+    CAST("numVotes" AS VARCHAR) AS "num_votes"
+    FROM "imdb_title_ratings"
+""").to_pandas()
+```
+
+```{python}
+ibis.options.interactive = True
+```
+
+```{python}
+con.sql("""
+    SELECT
+    "tconst",
+    CAST("averageRating" AS VARCHAR) AS "average_rating",
+    CAST("numVotes" AS VARCHAR) AS "num_votes"
+    FROM "imdb_title_ratings"
+""")
+```
+
+## Otras operaciones
+
+```{python}
+basics.columns
+```
+
+Para "GROUP BY" con `count()` tenemos el método `value_counts()`
+
+```{python}
+basics.title_type.value_counts()
+```
+
+Para nuestro análisis final, vamos a limipiar unas cosas.
+
+Vamos a seleccionar solo títulos con el tipo "movie" (película) y desechar las películas adultas.
+
+Hacemos esto con una lista de predicados:
+
+```{python}
+basics = (
+    basics
+    .filter([basics.title_type == "movie", basics.is_adult == 0])
+    .select("tconst", "primary_title")
+)
+```
+
+```{python}
+basics
+```
+
+Ahora, unimos la tabla `basics` y la tabla `ratings` usando la columna `tconst`, y ejecutamos.
+
+```{python}
+basics.join(ratings, "tconst").to_pandas(limit=10)
+```
+
+Ordenamos por `average_rating`
+
+```{python}
+basics.join(ratings, "tconst").order_by(_.average_rating.desc())
+```
+
+Y filtramos los títulos con votos más que un millón.
+
+```{python}
+(
+    basics.join(ratings, "tconst")
+    .order_by(_.average_rating.desc())
+    .filter(_.num_votes > 1e6)
+)
+```
+
+## Unión de tablas (`join`)
+
+Finalmente, mostramos la expresión entera para computar las diez mejores películas.
+
+```{python}
+topfilms = (
+    basics.join(ratings, "tconst")
+    .order_by(_.average_rating.desc())
+    .filter(_.num_votes > 1e6)
+)
+```
+
+```{python}
+ibis.options.interactive = False
+```
+
+```{python}
+topfilms
+```
+
+```{python}
+topfilms.to_pandas(limit=10)
+```
+
+## ¡Ejecutamos la misma expresión en Postgres!
+
+### Conectar a Postgres con Ibis
+
+```{python}
+pgcon = ibis.postgres.connect()
+pgcon.list_tables()
+```
+
+### Poner los datos adentro de Postgres
+
+```{python}
+!psql < create_imdb.sql
+!duckdb < load_imdb.sql
+```
+
+### Ahora, chequear que las tablas existan
+
+```{python}
+pgcon.list_tables()
+```
+
+Ejecutamos la misma expresión en Postgres:
+
+```{python}
+pgcon.to_pandas(topfilms)
+```
+
+¡Ya está, y eso es Ibis!
+
+Ibis tiene muchos backends como Snowflake, DuckDB (lo que está aquí), y más.
