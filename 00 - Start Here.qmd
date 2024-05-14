@@ -1,3 +1,7 @@
+---
+jupyter: python3
+---
+
 # Welcome to the Ibis tutorial!
 
 On the left 👈 there is a file browser open with the tutorial notebooks.

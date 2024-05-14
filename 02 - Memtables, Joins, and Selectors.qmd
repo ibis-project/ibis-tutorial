@@ -1,9 +1,8 @@
 ---
-title: 'Memtables, Joins and, Selectors, oh my!'
 jupyter: python3
 ---
 
-
+# Memtables, Joins and, Selectors, oh my!
 
 ## Memtables
 
