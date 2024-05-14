@@ -196,7 +196,7 @@ recursive_dependents = (
     .select(name=_.dependency, n_dependents=_.n_dependents)
 )
 recursive_dependents
-````
+```
 
 ## Integration with other tools
 
