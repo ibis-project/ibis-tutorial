@@ -183,7 +183,11 @@ basics.join(ratings, "tconst").order_by(_.average_rating.desc())
 Y filtramos los títulos con votos más que un millón.
 
 ```{python}
-basics.join(ratings, "tconst").order_by(_.average_rating.desc()).filter(_.num_votes > 1e6)
+(
+    basics.join(ratings, "tconst")
+    .order_by(_.average_rating.desc())
+    .filter(_.num_votes > 1e6)
+)
 ```
 
 ## Unión de tablas (`join`)
