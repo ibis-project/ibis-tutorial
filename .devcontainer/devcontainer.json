@@ -16,7 +16,8 @@
         "notifications.doNotDisturbMode": true,
         "update.showReleaseNotes": false,
         "vsicons.dontShowNewVersionMessage": true,
-        "workbench.welcomePage.walkthroughs.openOnInstall": false
+        "workbench.welcomePage.walkthroughs.openOnInstall": false,
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
       },
       "extensions": ["ms-toolsai.jupyter", "ms-python.python", "quarto.quarto"]
     }
