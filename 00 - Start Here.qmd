@@ -9,11 +9,40 @@ For convenience they're also linked below 👇
 1. [Playing with PyPI](./03%20-%20Playing%20with%20PyPI.ipynb)
 
 
-Let's kick things off by loading some PyPI package data into a local PostgreSQL database!
-We will do this using DuckDB, yes you can do that! 
+First, let's kick off a download of some PyPI maintainer data, we'll use this later on.
 
 ```{python}
-!duckdb < load_pypi.sql
+import urllib.request
+from pathlib import Path
+
+## Download PyPI maintainer data from Ibis Tutorial bucket
+
+filenames = [
+    "deps.parquet",
+    "maintainers.parquet",
+    "package_urls.parquet",
+    "packages.parquet",
+    "scorecard_checks.parquet",
+    "wheels.parquet",
+]
+
+folder = Path("pypi")
+folder.mkdir(exist_ok=True)
+
+for filename in filenames:
+    path = folder / filename
+    if not path.exists():
+        print(f"Downloading {filename} to {path}")
+        urllib.request.urlretrieve(
+            f"https://storage.googleapis.com/ibis-tutorial-data/pypi/2024-04-24/{filename}",
+            path,
+        )
+```
+
+Let's continue by loading some IMDB ratings data into a local PostgreSQL database!
+We will do this using DuckDB, yes you can do that!
+
+```{python}
 !psql < demo/create_imdb.sql
 !duckdb < demo/load_imdb.sql
 ```
