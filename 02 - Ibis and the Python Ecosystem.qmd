@@ -298,8 +298,8 @@ Depending on the library, this may work through a few mechanisms:
 ---
 
 For example, here we demonstrate passing an `ibis.Table` to the `altair` plotting
-library. Notice that you don't have to manually call any of the `to_*` methods 
-yourself! This is because `altair` supports anything that implements the `__dataframe__` 
+library. Notice that you don't have to manually call any of the `to_*` methods
+yourself! This is because `altair` supports anything that implements the `__dataframe__`
 protocol as input, which means it can accept an `ibis.Table` directly.
 
 ```{python}
