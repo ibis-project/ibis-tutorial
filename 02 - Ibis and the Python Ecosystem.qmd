@@ -118,7 +118,7 @@ and returns an aggregate value constructed from columns in that table. The
 the need to create an intermediate python variable.
 
 Another way of spelling this (one some might consider nicer syntax) is through
-usage of ibis's `_` API. This is a "magical" object that constructs "deferred
+the usage of ibis's `_` API. This is a "magical" object that constructs "deferred
 expressions". Everywhere you see `_` in the expression you should read "the
 current table (`self`) in the method being called".
 
@@ -297,7 +297,10 @@ Depending on the library, this may work through a few mechanisms:
 
 ---
 
-For example, here we demonstrate passing an `ibis.Table` to the `altair` plotting library. Notice that you don't have to manually call any of the `to_*` methods yourself! This is because `altair` supports anything that implements the `__dataframe__` protocol as input, which means it can accept an `ibis.Table` directly.
+For example, here we demonstrate passing an `ibis.Table` to the `altair` plotting
+library. Notice that you don't have to manually call any of the `to_*` methods
+yourself! This is because `altair` supports anything that implements the `__dataframe__`
+protocol as input, which means it can accept an `ibis.Table` directly.
 
 ```{python}
 import altair as alt

@@ -10,6 +10,7 @@ For convenience they're also linked below 👇
 
 
 Let's kick things off by loading some PyPI package data into a local PostgreSQL database!
+We will do this using DuckDB, yes you can do that! 
 
 ```{python}
 !duckdb < load.sql
