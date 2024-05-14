@@ -1,0 +1,194 @@
+---
+title: 'Switching Backends'
+jupyter: python3
+---
+
+## Switching Backends
+
+One use case for Ibis's portable API is the ability to develop a query locally
+(using `duckdb`, for example) on a subset of the data, then rerun that same
+query on the full dataset (using `bigquery`, for example) without rewriting
+your code.
+
+In this notebook we'll develop some queries locally on a subset of a real world
+dataset, then rerun those same queries on the full remote dataset.
+
+## IMDB Dataset
+
+For this section, we'll use some of Ibis' built-in example datasets,
+specifically, some IMDB data.
+
+---
+
+**Note**: the full data for both of these tables is available in
+`ibis.examples.imdb_title_ratings` and `ibis.examples.imdb_title_basics`, but
+we're not using those in-person to avoid everyone downloading the same 250mb
+file at once.
+
+---
+
+```{python}
+from pathlib import Path
+
+filenames = [
+    "imdb_title_basics_sample_5.parquet",
+    "imdb_title_ratings.parquet",
+]
+
+folder = Path("imdb_smol")
+folder.mkdir(exist_ok=True)
+```
+
+```{python}
+for filename in filenames:
+    path = folder / filename
+    if not path.exists():
+        import urllib.request
+
+        urllib.request.urlretrieve(
+            f"https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/{filename}",
+            path,
+        )
+```
+
+```{python}
+!ls
+```
+
+### Parquet loading
+
+In the previous examples we used a pre-existing DuckDB database, and some
+in-memory tables. Another common pattern is that you have a few parquet files
+you want to work with. We can load those in to an in-memory DuckDB connection.
+(Note that "in-memory" here just means ephemeral, DuckDB is still very happy to
+operate on as much data as your hard drive can hold)
+
+```{python}
+con = ibis.duckdb.connect()
+```
+
+```{python}
+basics = con.read_parquet(
+    "imdb_smol/imdb_title_basics_sample_5.parquet", table_name="imdb_title_basics"
+)
+```
+
+```{python}
+ratings = con.read_parquet(
+    "imdb_smol/imdb_title_ratings.parquet", table_name="imdb_title_ratings"
+)
+```
+
+The `read_parquet` method returns an Ibis table that points to the
+to-be-ingested `parquet` file. 
+
+`read_parquet` also registers the table with DuckDB (or another backend), so
+you can also load the tables like we did for the `penguins` table in the
+previous notebook.
+
+```{python}
+basics = con.tables.imdb_title_basics  # this cell is redundant, just here for demonstration
+```
+
+```{python}
+ratings = con.tables.imdb_title_ratings  # this cell is redundant, just here for demonstration
+```
+
+```{python}
+#| scrolled: true
+basics
+```
+
+## Exercises
+
+### Exercise 1
+
+Join `basics` with `ratings` on the `tconst` column.
+
+
+#### Solution
+
+```{python}
+#| scrolled: true
+%load solutions/nb02_ex01.py
+```
+
+### Exercise 2
+
+Join `basics` with `ratings` on `tconst`, and select out only the `titleType`,
+`primaryTitle`, `numVotes`, `averageRating`, and `isAdult`  columns.
+
+
+#### Solution
+
+```{python}
+%load solutions/nb02_ex02.py
+```
+
+### Exercise 3
+
+Those `camelCase` column names aren't [PEP
+8](https://peps.python.org/pep-0008/) compliant, and feel a bit clunky to use.
+Modify the above to change them to `snake_case` (for example, rename
+`titleType` to `title_type`).
+
+There are two ways you might achieve this:
+
+- Using the `Table.rename` method
+- Or by modifying the `.select` used above to do the relabeling in one step.
+
+
+#### Solution
+
+```{python}
+%load solutions/nb02_ex03_rename.py
+```
+
+```{python}
+%load solutions/nb02_ex03_select.py
+```
+
+### Exercise 4
+
+Using the above joined table, compute the 10 non-adult movies with the highest
+average rating having received at least 100,000 votes.
+
+
+#### Solution
+
+```{python}
+%load solutions/nb02_ex04.py
+```
+
+## Expression portability
+
+```{python}
+import os
+
+# this will only work if you have snowflake credentials set up in this environment variable
+# snowflake_con = ibis.connect(os.getenv("SNOWFLAKE_URL"))
+```
+
+Note that for demo purposes, we've preloaded these tables into our Snowflake
+account. But if you wanted to add them to your Snowflake account, you could
+make use of `read_parquet` or similar!
+
+```{python}
+# snowflake_con.list_tables(like="imdb")
+```
+
+```{python}
+ibis.options.interactive = False
+```
+
+```{python}
+# expr = sol4.unbind()
+```
+
+```{python}
+# expr
+```
+
+```{python}
+# snowflake_con.execute(expr).head(10)
+```
