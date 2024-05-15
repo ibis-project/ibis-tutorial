@@ -17,14 +17,10 @@ dataset, then rerun those same queries on the full remote dataset.
 For this section, we'll use some of Ibis' built-in example datasets,
 specifically, some IMDB data.
 
----
-
 **Note**: the full data for both of these tables is available in
 `ibis.examples.imdb_title_ratings` and `ibis.examples.imdb_title_basics`, but
 we're not using those in-person to avoid everyone downloading the same 250mb
 file at once.
-
----
 
 ```{python}
 from pathlib import Path
