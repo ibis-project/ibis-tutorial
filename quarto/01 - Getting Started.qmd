@@ -333,11 +333,11 @@ penguins_imperial_select = penguins
 #### Solutions
 
 ```{python}
-# %load solutions/nb01_ex01_mutate_drop.py
+%load solutions/nb01_ex01_mutate_drop.py
 ```
 
 ```{python}
-# %load solutions/nb01_ex01_select.py
+%load solutions/nb01_ex01_select.py
 ```
 
 ### Does it matter which method you choose?
@@ -466,7 +466,7 @@ your solution doesn't look like ours, what's important is that the results are
 the same.
 
 ```{python}
-# %load solutions/nb01_ex02.py
+%load solutions/nb01_ex02.py
 ```
 
 ### Exercise 3
@@ -478,7 +478,7 @@ data collection?
 #### Solution
 
 ```{python}
-# %load solutions/nb01_ex03.py
+%load solutions/nb01_ex03.py
 ```
 
 ## A brief digression on the SQL Ibis generates
