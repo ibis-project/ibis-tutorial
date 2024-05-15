@@ -177,12 +177,17 @@ order_totals = (
 order_totals
 ```
 
-
 Note that you don't have to use deferred expressions if you don't want to!
 Queries using deferred expressions may always be expressed without them (using
 either a `lambda` function, or an intermediate python variable) - they're there
 as friendly "syntactic sugar" to ease writing complex queries when you need
 them.
+
+#### Solution
+
+```{python}
+%load solutions/nb02_ex01.py
+```
 
 ## Mixing memtables with database tables
 
@@ -236,6 +241,11 @@ Your job is to:
 - Join the original `penguins` table with the new `species` memtable to label
   every row with its proper scientific name.
 
+#### Solution
+
+```{python}
+%load solutions/nb02_ex02.py
+```
 
 ## Exporting In-memory Data
 
