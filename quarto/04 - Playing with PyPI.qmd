@@ -1,7 +1,8 @@
 ---
-title: Playing with PyPI (data)
 jupyter: python3
 ---
+
+# Playing with PyPI (data)
 
 Many thanks to Seth M. Larson for making these available: https://github.com/sethmlarson/pypi-data
 

@@ -6,7 +6,7 @@
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "customizations": {
     "codespaces": {
-      "openFiles": ["00 - Start Here.qmd"]
+      "openFiles": ["00 - Start Here.ipynb"]
     },
     "vscode": {
       "settings": {

@@ -1,9 +1,8 @@
 ---
-title: 'Switching Backends'
 jupyter: python3
 ---
 
-## Switching Backends
+# Switching Backends
 
 One use case for Ibis's portable API is the ability to develop a query locally
 (using `duckdb`, for example) on a subset of the data, then rerun that same
