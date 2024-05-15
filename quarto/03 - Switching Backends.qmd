@@ -117,7 +117,7 @@ Join `basics` with `ratings` on the `tconst` column.
 
 ```{python}
 #| scrolled: true
-%load solutions/nb02_ex01.py
+%load solutions/nb03_ex01.py
 ```
 
 ### Exercise 2
@@ -129,7 +129,7 @@ Join `basics` with `ratings` on `tconst`, and select out only the `titleType`,
 #### Solution
 
 ```{python}
-%load solutions/nb02_ex02.py
+%load solutions/nb03_ex02.py
 ```
 
 ### Exercise 3
@@ -148,11 +148,11 @@ There are two ways you might achieve this:
 #### Solution
 
 ```{python}
-%load solutions/nb02_ex03_rename.py
+%load solutions/nb03_ex03_rename.py
 ```
 
 ```{python}
-%load solutions/nb02_ex03_select.py
+%load solutions/nb03_ex03_select.py
 ```
 
 ### Exercise 4
@@ -164,7 +164,7 @@ average rating having received at least 100,000 votes.
 #### Solution
 
 ```{python}
-%load solutions/nb02_ex04.py
+%load solutions/nb03_ex04.py
 ```
 
 ## Expression portability
