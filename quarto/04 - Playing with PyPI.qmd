@@ -304,13 +304,13 @@ What's the deal with that spike at 12 maintainers?
 ### Solution
 
 ```{python}
-# %load solutions/nb04_ex05_counts.py
+%load solutions/nb04_ex05_counts.py
 ```
 
 ```{python}
-# %load solutions/nb04_ex05_ftw.py
+%load solutions/nb04_ex05_ftw.py
 ```
 
 ```{python}
-# %load solutions/nb04_ex05_ftw_maintainers.py
+%load solutions/nb04_ex05_ftw_maintainers.py
 ```

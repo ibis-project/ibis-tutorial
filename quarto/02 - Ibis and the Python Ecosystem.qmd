@@ -178,17 +178,17 @@ order_totals = (
 order_totals
 ```
 
-Note that you don't have to use deferred expressions if you don't want to!
-Queries using deferred expressions may always be expressed without them (using
-either a `lambda` function, or an intermediate python variable) - they're there
-as friendly "syntactic sugar" to ease writing complex queries when you need
-them.
-
 #### Solution
 
 ```{python}
 %load solutions/nb02_ex01.py
 ```
+
+Note that you don't have to use deferred expressions if you don't want to!
+Queries using deferred expressions may always be expressed without them (using
+either a `lambda` function, or an intermediate python variable) - they're there
+as friendly "syntactic sugar" to ease writing complex queries when you need
+them.
 
 ## Mixing memtables with database tables
 
