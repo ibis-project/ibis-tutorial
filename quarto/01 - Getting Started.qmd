@@ -1,6 +1,5 @@
 ---
 jupyter: python3
-allow_errors: True
 ---
 
 # Getting started
