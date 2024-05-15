@@ -1,7 +1,8 @@
 ---
-title: Ibis and the Python Ecosystem
 jupyter: python3
 ---
+
+# Ibis and the Python Ecosystem
 
 Ibis strives to be a friendly component of the larger Python data science
 ecosystem. In this notebook we'll walk through a few ways of using Ibis to
