@@ -1,8 +1,11 @@
 # Demo de Ibis
 
 ```{python}
+#| echo: false
 !curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_ratings.parquet'
 !curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet'
+!psql < create_imdb.sql
+!duckdb < load_imdb.sql
 ```
 
 Primero, importar Ibis:
@@ -218,16 +221,10 @@ topfilms.to_pandas(limit=10)
 
 ### Conectar a Postgres con Ibis
 
+Ya tengo los datos dentro de Postgres.
+
 ```{python}
 pgcon = ibis.postgres.connect()
-pgcon.list_tables()
-```
-
-### Poner los datos adentro de Postgres
-
-```{python}
-!psql < create_imdb.sql
-!duckdb < load_imdb.sql
 ```
 
 ### Ahora, chequear que las tablas existan
