@@ -1,4 +1,4 @@
-# Ibis Dempo
+# Ibis Demo
 
 ```{python}
 #| echo: false
@@ -30,7 +30,7 @@ We can list the names of the tables
 con.list_tables()
 ```
 
-And render an abstract version of the expresion withe the column's names and types:
+And render an abstract version of the expression with the column's names and types:
 
 ```{python}
 ratings
@@ -161,7 +161,7 @@ To do this, we will use a list of predicates
 ```{python}
 basics = (
     basics
-    .filter([basics.title_type == "movie", basics.is_adult == 0])
+    .filter(basics.title_type == "movie", basics.is_adult == 0)
     .select("tconst", "primary_title")
 )
 ```
@@ -170,11 +170,10 @@ basics = (
 basics
 ```
 
-Then, we join the `basics` table and the `ratings` table using the `tconst` column, 
-and we execute
+Then, we join the `basics` table and the `ratings` table using the `tconst` column.
 
 ```{python}
-basics.join(ratings, "tconst").to_pandas(limit=10)
+basics.join(ratings, "tconst")
 ```
 
 We order by `average_rating`
@@ -183,7 +182,7 @@ We order by `average_rating`
 basics.join(ratings, "tconst").order_by(_.average_rating.desc())
 ```
 
-And filter the titles with more than one million votes
+And keep only those titles with more than one million votes
 
 ```{python}
 (
@@ -233,12 +232,12 @@ pgcon = ibis.postgres.connect()
 pgcon.list_tables()
 ```
 
-Execute the same expresion in Postgres:
+Execute the same expression in Postgres:
 
 ```{python}
 pgcon.to_pandas(topfilms)
 ```
 
-¡That's it, that's Ibis!
+That's it, that's Ibis!
 
-Ibis has 20+ backends, like Snowflake, DuckDB (what we saw here), and more.
+Ibis has 20+ backends, like Snowflake, DuckDB (as seen above), and more.
