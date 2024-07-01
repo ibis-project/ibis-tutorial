@@ -1,6 +1,6 @@
 altair==5.3.0
-duckdb==0.10.2
-ibis-framework[duckdb,polars,bigquery,examples]==9.0.0
-jupyterlab==4.1.8
-plotnine==0.13.5
+duckdb==1.0.0
+ibis-framework[duckdb,polars,bigquery,examples]==9.1.0
+jupyterlab==4.2.3
+plotnine==0.13.6
 plotly>=5.22.0
