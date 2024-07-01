@@ -6,7 +6,7 @@ from packaging.version import parse as vparse
 
 ## Download penguins DuckDB file
 
-duck_version = vparse(duckdb.__version__)
+duck_version = vparse("0.10")
 
 ddb_file = Path("palmer_penguins.ddb")
 
