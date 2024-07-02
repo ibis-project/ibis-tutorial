@@ -176,7 +176,7 @@ Let's try out a few straightforward examples:
 con.sql("SELECT 1 + 1")
 ```
 
-This isn't a necessarily a _good_ way to do math, but it's available!
+This isn't necessarily a _good_ way to do math, but it's available!
 
 ```{python}
 con.sql("SELECT 1 + 1 as f")
