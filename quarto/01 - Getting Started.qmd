@@ -10,7 +10,7 @@ See the [README](https://github.com/ibis-project/ibis-tutorial#setup) for up-to-
 
 ## Download some data
 
-There are other ways to get example data, but we'll start by downloading the penguins dataset.
+There are other ways to get example data, but we'll start by downloading the penguin's dataset.
 $^1$.
 
 ```{python}
