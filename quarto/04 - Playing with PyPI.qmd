@@ -32,7 +32,7 @@ filenames = [
     "wheels.parquet",
 ]
 
-folder = Path("pypi")
+folder = Path("data/pypi")
 
 for filename in filenames:
     path = folder / filename

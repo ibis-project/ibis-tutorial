@@ -8,34 +8,6 @@ jupyter: python3
 
 See the [README](https://github.com/ibis-project/ibis-tutorial#setup) for up-to-date installation instructions!
 
-## Download some data
-
-There are other ways to get example data, but we'll start by downloading the penguins dataset.
-$^1$.
-
-```{python}
-from pathlib import Path
-
-import duckdb
-from packaging.version import parse as vparse
-
-duck_version = vparse(duckdb.__version__)
-
-ddb_file = Path("palmer_penguins.ddb")
-
-
-if not ddb_file.exists():
-    import urllib.request
-
-    urllib.request.urlretrieve(
-        f"https://storage.googleapis.com/ibis-tutorial-data/penguins/0.{duck_version.minor}/palmer_penguins.ddb",
-        ddb_file,
-    )
-```
-
-DuckDB is similar to sqlite -- we have a single file on disk (or an in-memory
-connection) that we can operate on.
-
 ## Intro
 
 We can begin by importing Ibis and firing up a connection to DuckDB! (DuckDB is
@@ -45,13 +17,8 @@ tutorials).
 ```{python}
 import ibis
 
-con = ibis.duckdb.connect("palmer_penguins.ddb", read_only=True)
+con = ibis.duckdb.connect("data/penguins/palmer_penguins.ddb", read_only=True)
 ```
-
-**Note**: when you connect to a DuckDB database file, DuckDB will create a
-  lock-file to prevent data corruption.  If you see a `palmer_penguins.ddb.wal`
-  file, you can safely ignore it. It will get cleaned up automatically.
-
 
 Now we have a connection, we can start by looking around.  Are there any tables
 in this database (one would hope)?

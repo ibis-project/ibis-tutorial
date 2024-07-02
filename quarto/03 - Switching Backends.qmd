@@ -14,41 +14,19 @@ dataset, then rerun those same queries on the full remote dataset.
 
 ## IMDB Dataset
 
-For this section, we'll use some of Ibis' built-in example datasets,
-specifically, some IMDB data.
+For this section, we'll make use of the IMDB dataset, which provides a
+[snapshot](https://datasets.imdbws.com/) of the films and ratings on IMDB. This
+dataset was downloaded at the start of the tutorial, and is available as a set of
+parquet files in the `data/imdb/` directory:
 
-**Note**: the full data for both of these tables is available in
-`ibis.examples.imdb_title_ratings` and `ibis.examples.imdb_title_basics`, but
-we're not using those in-person to avoid everyone downloading the same 250mb
-file at once.
 
 ```{python}
-from pathlib import Path
-
-filenames = [
-    "imdb_title_basics_sample_5.parquet",
-    "imdb_title_ratings.parquet",
-]
-
-folder = Path("imdb_smol")
-folder.mkdir(exist_ok=True)
+!ls data/imdb/
 ```
 
-```{python}
-for filename in filenames:
-    path = folder / filename
-    if not path.exists():
-        import urllib.request
-
-        urllib.request.urlretrieve(
-            f"https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/{filename}",
-            path,
-        )
-```
-
-```{python}
-!ls imdb_smol/
-```
+Here we'll load both the `imdb_title_ratings` and `imdb_title_basics_sample_5`
+files to work with a sample of the data. Once we have a query we're happy with
+we'll run the same query on the full dataset.
 
 ### Parquet loading
 
@@ -56,7 +34,7 @@ In the previous examples we used a pre-existing DuckDB database, and some
 in-memory tables. Another common pattern is that you have a few parquet files
 you want to work with. We can load those in to an in-memory DuckDB connection.
 (Note that "in-memory" here just means ephemeral, DuckDB is still very happy to
-operate on as much data as your hard drive can hold)
+operate on as much data as your hard drive can hold).
 
 ```{python}
 import ibis
@@ -71,13 +49,13 @@ con = ibis.duckdb.connect()
 
 ```{python}
 basics = con.read_parquet(
-    "imdb_smol/imdb_title_basics_sample_5.parquet", table_name="imdb_title_basics"
+    "data/imdb/imdb_title_basics_sample_5.parquet", table_name="imdb_title_basics"
 )
 ```
 
 ```{python}
 ratings = con.read_parquet(
-    "imdb_smol/imdb_title_ratings.parquet", table_name="imdb_title_ratings"
+    "data/imdb/imdb_title_ratings.parquet", table_name="imdb_title_ratings"
 )
 ```
 
