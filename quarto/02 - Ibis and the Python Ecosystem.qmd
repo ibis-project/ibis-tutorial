@@ -200,7 +200,7 @@ tables when composing queries against external systems.
 Here we load the same `penguins` dataset as in notebook 1:
 
 ```{python}
-con = ibis.duckdb.connect("palmer_penguins.ddb", read_only=True)
+con = ibis.duckdb.connect("data/penguins/palmer_penguins.ddb", read_only=True)
 penguins = con.table("penguins")
 
 penguins
@@ -225,10 +225,10 @@ penguins.join(coordinates, "island")
 ### Exercise 2: Add a Column for Scientific Name
 
 Like all species, the penguins here have scientific names. These are available
-in the `penguin_species.jsonl` file in the tutorial repo.
+in the `data/penguins/species.jsonl` file in the tutorial repo.
 
 ```{python}
-!cat penguin_species.jsonl
+!cat data/penguins/penguin_species.jsonl
 ```
 
 Ibis currently doesn't have a `read_json` method. No worries though, since this
@@ -236,8 +236,9 @@ dataset is small we can read the data using a different tool and pass it to
 `ibis` as a memtable.
 
 Your job is to:
-- Read in the `penguin_species.jsonl` file. You might find the
-  `pandas.read_json` function useful (note you'll need to pass in `lines=True`)
+
+- Read in the `species.jsonl` file. You might find the `pandas.read_json`
+  function useful (note you'll need to pass in `lines=True`)
 - Coerce it to a `memtable`.
 - Join the original `penguins` table with the new `species` memtable to label
   every row with its proper scientific name.

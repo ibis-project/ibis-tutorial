@@ -14,48 +14,11 @@ For convenience they're also linked below 👇
 1. [Playing with PyPI](./04%20-%20Playing%20with%20PyPI.ipynb)
 
 
-First, let's kick off a download of some PyPI maintainer data, we'll use this later on.
+This tutorial will make use of several datasets (and databases!). Before we
+start we need to download some data and setup some databases.
 
 ```{python}
-import urllib.request
-from pathlib import Path
+from setup_data import setup
 
-## Download PyPI maintainer data from Ibis Tutorial bucket
-
-filenames = [
-    "deps.parquet",
-    "maintainers.parquet",
-    "package_urls.parquet",
-    "packages.parquet",
-    "scorecard_checks.parquet",
-    "wheels.parquet",
-]
-
-folder = Path("pypi")
-folder.mkdir(exist_ok=True)
-
-for filename in filenames:
-    path = folder / filename
-    if not path.exists():
-        print(f"Downloading {filename} to {path}")
-        urllib.request.urlretrieve(
-            f"https://storage.googleapis.com/ibis-tutorial-data/pypi/2024-04-24/{filename}",
-            path,
-        )
-```
-
-Let's continue by loading some IMDB ratings data into a local PostgreSQL database!
-We will do this using DuckDB, yes you can do that!
-
-```{python}
-!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_ratings.parquet'
-!curl -OLsS 'https://storage.googleapis.com/ibis-tutorial-data/imdb/2024-03-22/imdb_title_basics.parquet'
-!psql < demo/create_imdb.sql
-!duckdb < load_imdb.sql
-```
-
-And we'll confirm that our PostgreSQL database contains the tables we just loaded.
-
-```{python}
-!psql < verify.sql
+setup()
 ```
