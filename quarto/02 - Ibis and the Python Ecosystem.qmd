@@ -264,7 +264,7 @@ Supporting multiple output formats lets you efficiently compose ibis with
 existing systems. Have some downstream code that expects a `pandas.DataFrame`?
 Use ibis to do some initial processing then hand off the result to your
 existing code. Our wide support for popular Python data tools means `ibis` can
-often fit nicely in to existing workflows without forcing all code be ported to
+often fit nicely in to existing workflows without forcing all code to be ported to
 use `ibis`.
 
 ```{python}
