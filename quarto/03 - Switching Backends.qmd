@@ -9,7 +9,7 @@ One use case for Ibis's portable API is the ability to develop a query locally
 query on the full dataset (using `bigquery`, for example) without rewriting
 your code.
 
-In this notebook we'll develop some queries locally on a subset of a real world
+In this notebook we'll develop some queries locally on a subset of a real-world
 dataset, then rerun those same queries on the full remote dataset.
 
 ## IMDB Dataset
