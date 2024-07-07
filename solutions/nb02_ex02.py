@@ -1,3 +1,5 @@
-names_df = pd.read_json("data/penguins/species.jsonl", lines=True)
-names = ibis.memtable(names_df)
-penguins.join(names, "species")
+# Coerce the dataframe to an ibis table
+coordinates = ibis.memtable(coordinates_df)
+
+# Join with the existing penguins table
+penguins.join(coordinates, "island")

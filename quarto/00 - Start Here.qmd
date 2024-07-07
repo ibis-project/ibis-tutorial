@@ -9,7 +9,7 @@ On the left 👈 there is a file browser open with the tutorial notebooks.
 For convenience they're also linked below 👇
 
 1. [Getting Started](./01%20-%20Getting%20Started.ipynb)
-1. [Ibis and the Python Ecosystem](./02%20-%20Ibis%20and%20the%20Python%20Ecosystem.ipynb)
+1. [Importing and Exporting Data](./02%20-%20Importing%20and%20Exporting%20Data.ipynb)
 1. [Switching Backends](./03%20-%20Switching%20Backends.ipynb)
 1. [Playing with PyPI](./04%20-%20Playing%20with%20PyPI.ipynb)
 
