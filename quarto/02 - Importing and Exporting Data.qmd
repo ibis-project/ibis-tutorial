@@ -1,0 +1,353 @@
+---
+jupyter: python3
+---
+
+# Importing and Exporting Data
+
+In the previous notebook we showed connecting Ibis to an existing database
+(specifically a DuckDB) database. While this is a common way of accessing data
+in Ibis, it's not the only way. In this notebook we'll walk through a few
+different ways of importing data into Ibis, as well as ways to export it to
+other systems. Being able to support a wide variety of input and output formats
+is essential to ensuring Ibis works well within the larger Python data
+ecosystem.
+
+## Importing Data from Existing Databases
+
+One common way of loading data into Ibis is by connecting to an existing
+backend that already has a collection of existing of tables. Backends use
+different nomenclatures for these, but in ibis a collection of tables is called
+a "database". Some backends also have a concept for a collection of databases
+(also using backend-specific terminology). In Ibis we call these "catalogs".
+
+To connect to an existing backend system you'd use the corresponding
+`ibis.<backend>.connect` function. The parameters required here to connect
+differ per backend. For example:
+
+```python
+import ibis
+
+# Connect to duckdb
+con = ibis.duckdb.connect("path/to/database.db")
+
+# Connect to postgres
+con = ibis.postgres.connect(host="postgres-hostname", password="postgres-password")
+
+# Connect to bigquery
+con = ibis.bigquery.connect(project_id="bigquery-project", dataset_id="example")
+
+# ...
+```
+
+Here we'll connect to the same `duckdb` database that we used in notebook 1.
+
+```{python}
+import ibis
+
+ibis.options.interactive = True
+```
+
+```{python}
+con = ibis.duckdb.connect("data/penguins/palmer_penguins.ddb", read_only=True)
+```
+
+Existing tables can then be seen and accessed using the `list_tables` and
+`table` methods on the connection.
+
+```{python}
+# List all existing tables in a backend
+con.list_tables()
+```
+
+```{python}
+# Access an existing table in the backend
+penguins = con.table("penguins")
+
+penguins
+```
+
+## Importing Data from Files
+
+Sometimes you want to accesss data that isn't already loaded into an existing
+backend, but rather exists in a common file format (`csv`, `parquet`, `json`,
+...). Ibis also supports loading data from these sources using corresponding
+`read_csv`/`read_parquet`/`read_json` functions or methods.
+
+There are two ways of doing this:
+
+- Using the method versions (e.g. `con.read_csv`), which will execute on the
+  `con` backend.
+- Using the function versions (e.g. `ibis.read_csv`), which will execute using
+  the configured *default backend* (if none is configured, will use `duckdb`).
+
+The latter mainly exist as a convenience, in most cases using the method
+versions will be easier.
+
+### Exercise 1: Add a Column for Scientific Name
+
+Like all species, the penguins here have scientific names. These are available
+in the `data/penguins/species.csv` file in the tutorial repo.
+
+```{python}
+!cat data/penguins/species.csv
+```
+
+Your job is to:
+
+- Read in the `species.csv` file using the `con.read_csv` method.
+- Join the original `penguins` table with the new `species` table to label
+  every row with its proper scientific name.
+
+```{python}
+# Your code here...
+```
+
+#### Solution
+
+```{python}
+%load solutions/nb02_ex01.py
+```
+
+## Importing In-Memory Data
+
+Ibis can also import data from in-memory formats.
+
+To load in-memory data into `ibis` you can use `ibis.memtable`. This takes in
+either an existing dataframe-like object (currently `pandas`, `polars`, and
+`pyarrow` are supported), or a dict of column-name -> data to use.
+
+```{python}
+# Create a table from a pandas.DataFrame
+import pandas as pd
+
+items = ibis.memtable(
+    pd.DataFrame(
+        {
+            "item": ["apple", "banana", "orange"],
+            "price": [0.75, 0.23, 0.92],
+            "avg_weight": [0.120, 0.118, 0.150],
+        }
+    )
+)
+
+items
+```
+
+```{python}
+# Create a table from a pyarrow.Table
+import pyarrow as pa
+
+inventory = ibis.memtable(
+    pa.table(
+        {
+            "item": ["apple", "banana", "orange"],
+            "count": [212, 125, 90],
+        }
+    )
+)
+
+inventory
+```
+
+```{python}
+# Create a table from a polars.DataFrame
+import polars as pl
+
+orders = ibis.memtable(
+    pl.DataFrame(
+        {
+            "id": [1234, 1234, 1235, 1235, 1236],
+            "item": ["apple", "orange", "banana", "orange", "banana"],
+            "count": [5, 3, 4, 10, 6],
+        }
+    )
+)
+
+orders
+```
+
+These tables can then be queried the same as any other ibis table.
+
+```{python}
+# Find the most expensive item
+items.order_by(ibis.desc("price")).limit(1)
+```
+
+```{python}
+# Find the product with the most items in stock
+inventory.order_by(ibis.desc("count")).limit(1)
+```
+
+```{python}
+# Find the most expensive item per kg
+items.mutate(price_per_kg=items.price / items.avg_weight).order_by(ibis.desc("price_per_kg")).limit(1)
+```
+
+You can even compose queries that make use of tables of different input types.
+Here we compose a query that joins a `pandas.DataFrame` with a
+`polars.DataFrame`.
+
+```{python}
+# Compute the total cost of each order
+order_totals = (
+    orders.join(items, "item")                             # 1. Join orders with items by item name
+    .group_by("id")                                        # 2. Group By the order id
+    .agg(total=lambda t: (t["price"] * t["count"]).sum())  # 3. Compute the total cost as sum(price * count) per order
+)
+
+order_totals
+```
+
+When querying in-memory data wrapped in `ibis.memtable`, `ibis` will use the
+current default backend (`duckdb` by default), _unless_ the query also makes
+use of a table attached to some other database. This means that `ibis.memtable`
+may be used to create efficient lookup tables when composing queries against
+external systems.
+
+### Exercise 2: Add Columns for Island Coordinates
+
+Here we provide coordinate data for the 3 islands present in the `penguins`
+dataset as a pandas dataframe. 
+
+```{python}
+import pandas as pd
+
+coordinates_df = pd.DataFrame(
+    {
+        "island": ["Biscoe", "Dream", "Torgersen"],
+        "latitude": [-65.433333, -64.733333, -64.766667],
+        "longitude": [-65.5, -64.233333, -64.083333],
+    }
+)
+```
+
+Your job is to:
+
+- Coerce it to an `ibis.Table` using `ibis.memtable`
+- Join the original `penguins` table with the new `coordinates` table to label
+  every row with its island coordinates
+
+```{python}
+# Your code here...
+```
+
+#### Solution
+
+```{python}
+%load solutions/nb02_ex02.py
+```
+
+## Exporting Data to Files
+
+Just as Ibis can load data from file formats like `parquet` or `csv`, it can
+also write results to these formats.
+
+- `query.to_parquet()`: writes results as a parquet file
+- `query.to_csv()`: writes results as a csv file
+- `query.to_delta()`: writes results as a Delta Lake table
+
+### Exercise 3: Write query results to csv
+
+The current `penguins` dataset contains a single table containing data for all
+three islands (Biscoe, Dream, and Torgersen).
+
+Below, please write some python code to produce 3 new `csv` files, each named
+after an island and containing only the data for that island (i.e. the
+`biscoe.csv` file should only contain data from "Biscoe").
+
+```{python}
+islands = ["Biscoe", "Dream", "Torgersen"]
+
+# Your code here
+```
+
+#### Solution
+
+```{python}
+%load solutions/nb02_ex03.py
+```
+
+## Exporting In-memory Data
+
+Similar to how `ibis` can consume multiple in-memory data formats, we also can
+return queries in multiple input formats using one of the various `to_*`
+methods:
+
+- `query.to_pandas()`: returns results as a `pandas.DataFrame`
+- `query.to_polars()`: returns results as a `polars.DataFrame`
+- `query.to_pyarrow()`: returns results as a `pyarrow.Table`
+- `query.to_pyarrow_batches()`: returns results as a `pyarrow.RecordBatchReader`
+- `query.to_torch()`: returns results as a `dict` of `torch.Tensor`s
+
+Supporting multiple output formats lets you efficiently compose ibis with
+existing systems. Have some downstream code that expects a `pandas.DataFrame`?
+Use ibis to do some initial processing then hand off the result to your
+existing code. Our wide support for popular Python data tools means `ibis` can
+often fit nicely in to existing workflows without forcing all code be ported to
+use `ibis`.
+
+```{python}
+mean_mass = penguins.group_by("species").body_mass_g.mean()
+mean_mass
+```
+
+```{python}
+# Get results as a pandas DataFrame
+df = mean_mass.to_pandas()
+
+print(type(df))
+
+df
+```
+
+```{python}
+# Get results as a polars DataFrame
+mean_mass.to_polars()
+```
+
+```{python}
+# Get results as a pyarrow Table
+mean_mass.to_pyarrow()
+```
+
+## Integrating Ibis with Downstream Tools
+
+Some downstream tools may be able to accept `ibis.Table` objects directly as
+inputs without requiring you to manually call one of the `.to_*` methods to
+convert a query to an in-memory format.
+
+Depending on the library, this may work through a few mechanisms:
+
+- Using the `__array__` protocol. Libraries expecting `numpy` arrays often also
+  accept objects implementing this method.
+- Using the `__dataframe__` protocol. This is a newer protocol, but is accepted
+  by some libraries (a popular one is the plotting library `altair`)
+- Using the `__arrow_c_stream__` protocol. This is also a new protocol for
+  tooling passing around arrow tables.
+
+---
+
+For example, here we demonstrate passing an `ibis.Table` to the `altair` plotting
+library. Notice that you don't have to manually call any of the `to_*` methods
+yourself! This is because `altair` supports anything that implements the `__dataframe__`
+protocol as input, which means it can accept an `ibis.Table` directly.
+
+```{python}
+import altair as alt
+```
+
+```{python}
+# Make a scatterplot of bill length x bill depth for each penguin species
+chart = (
+    alt.Chart(penguins)  # <- here we pass in an `ibis.Table` directly
+        .mark_circle(size=60)
+        .encode(
+            x=alt.X('bill_length_mm', scale=alt.Scale(zero=False)),
+            y=alt.Y('bill_depth_mm', scale=alt.Scale(zero=False)),
+            color=alt.Color('species'),
+            tooltip=['species', 'sex', 'island']
+        )
+)
+
+chart
+```
