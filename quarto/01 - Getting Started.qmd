@@ -493,7 +493,7 @@ left.join(right, "key_column_name")
 Add a new column to the `penguins` table with the mean mass of penguins found
 on that island.
 
-```python
+```{python}
 mean_mass_per_island = (
     penguins
     .group_by("island")
