@@ -51,12 +51,16 @@ con = ibis.duckdb.connect()
 basics = con.read_parquet(
     "data/imdb/imdb_title_basics_sample_5.parquet", table_name="imdb_title_basics"
 )
+
+basics
 ```
 
 ```{python}
 ratings = con.read_parquet(
     "data/imdb/imdb_title_ratings.parquet", table_name="imdb_title_ratings"
 )
+
+ratings
 ```
 
 ## Exercises
