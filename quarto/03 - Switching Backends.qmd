@@ -30,11 +30,11 @@ we'll run the same query on the full dataset.
 
 ### Parquet loading
 
-In the previous examples we used a pre-existing DuckDB database, and some
-in-memory tables. Another common pattern is that you have a few parquet files
-you want to work with. We can load those in to an in-memory DuckDB connection.
-(Note that "in-memory" here just means ephemeral, DuckDB is still very happy to
-operate on as much data as your hard drive can hold).
+Here we use the `read_parquet` method discussed in the previous notebook to
+load some data into DuckDB. Note that DuckDB treats this as a "view", meaning
+that the data isn't copied or loaded into memory - it still only exists on disk
+in the `parquet` files, meaning you can happily operate on parquet datasets
+that are much larger than the RAM on your laptop.
 
 ```{python}
 import ibis
@@ -59,26 +59,6 @@ ratings = con.read_parquet(
 )
 ```
 
-The `read_parquet` method returns an Ibis table that points to the
-to-be-ingested `parquet` file. 
-
-`read_parquet` also registers the table with DuckDB (or another backend), so
-you can also load the tables like we did for the `penguins` table in the
-previous notebook.
-
-```{python}
-basics = con.tables.imdb_title_basics  # this cell is redundant, just here for demonstration
-```
-
-```{python}
-ratings = con.tables.imdb_title_ratings  # this cell is redundant, just here for demonstration
-```
-
-```{python}
-#| scrolled: true
-basics
-```
-
 ## Exercises
 
 ### Exercise 1
@@ -89,7 +69,6 @@ Join `basics` with `ratings` on the `tconst` column.
 #### Solution
 
 ```{python}
-#| scrolled: true
 %load solutions/nb03_ex01.py
 ```
 
