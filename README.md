@@ -11,7 +11,7 @@ Previous iterations of this tutorial have been given at:
 The Ibis team uses Zulip to answer questions and chat!  You can join using this
 invitation link:
 
-https://ibis-project.zulipchat.com/join/v3w6emt6vw6jmzoyepanbcdk/
+https://ibis-project.zulipchat.com/join/3pri2odw4bt4764icmphtdv6/
 
 ## Codespace Setup
 
